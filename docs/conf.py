@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import json
+import hashlib
 from datetime import datetime
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -198,8 +199,15 @@ html_show_sphinx = False
 html_show_sourcelink = False
 html_show_search_summary = False
 _BREADCRUMB_SECTIONS = {"zh": {}, "en": {}}
+# Keep cached theme assets until their content changes, including local previews.
+_ASSET_HASH = hashlib.sha256()
+for _asset_root in (_THEME_DIR / "psdocs/static", Path(__file__).parent / "static"):
+    for _asset in sorted(_asset_root.rglob("*")):
+        if _asset.is_file():
+            _ASSET_HASH.update(_asset.relative_to(_asset_root).as_posix().encode() + b"\0")
+            _ASSET_HASH.update(_asset.read_bytes())
 html_context = {
-    "asset_version": "a2rt-02",
+    "asset_version": _ASSET_HASH.hexdigest()[:16],
     "a2rt_base": _CONFIG["base_path"],
     "a2rt_home": _CONFIG["base_path"] + ("en/" if _LANGUAGE_CODE == "en" else ""),
     "a2rt_ai_enabled": _AI_ENABLED,
