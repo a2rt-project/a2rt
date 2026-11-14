@@ -186,6 +186,7 @@
   flex: 0 0 auto;
   color: var(--color-fg-muted);
 }
+.ps-search-modal__challenge,
 .ps-search-modal__loading {
   display: flex;
   align-items: center;
@@ -193,6 +194,7 @@
   min-height: 120px;
   padding: var(--space-4) 0;
 }
+.ps-search-modal__challenge[hidden],
 .ps-search-modal__loading[hidden] { display: none; }
 .ps-search-modal__spinner {
   width: 36px;

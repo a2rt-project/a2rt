@@ -98,7 +98,7 @@
               </svg>
               <span data-ps-ai-query>{{ ps_ui.search_placeholder }}</span>
             </button>
-            <div data-turnstile-container></div>
+            <div class="ps-search-modal__challenge" data-turnstile-container hidden></div>
             <div class="ps-search-modal__loading" data-ps-ai-loading hidden aria-live="polite" aria-label="{{ ps_ui.ai_search_loading }}">
               <div class="ps-search-modal__spinner" aria-hidden="true"></div>
             </div>
@@ -113,6 +113,7 @@
         </div>
         <div class="ps-search-modal__notice" data-ps-ai-notice
              data-empty="{{ ps_ui.ai_search_empty }}"
+             data-verifying="{{ ps_ui.ai_search_verifying }}"
              data-loading="{{ ps_ui.ai_search_loading }}"
              data-error="{{ ps_ui.ai_search_error }}"
              data-no-sources="{{ ps_ui.ai_search_no_sources }}"

@@ -168,6 +168,7 @@
     var aiSearch = modal.querySelector("[data-ps-search-ai]");
     var aiQueryRow = modal.querySelector("[data-ps-ai-query-row]");
     var aiLoading = modal.querySelector("[data-ps-ai-loading]");
+    var challenge = modal.querySelector("[data-turnstile-container]");
     var answer = modal.querySelector("[data-ps-ai-answer]");
     var answerText = modal.querySelector("[data-ps-ai-answer-text]");
     var sources = modal.querySelector("[data-ps-ai-sources]");
@@ -302,6 +303,8 @@
     }
 
     function resetAnswer() {
+      if (pendingRequest) { pendingRequest.abort(); pendingRequest = null; }
+      resetChallenge();
       if (answer) answer.hidden = true;
       if (answerText) answerText.innerHTML = "";
       if (sources) sources.hidden = true;
@@ -309,6 +312,7 @@
       if (retention) retention.hidden = true;
       if (aiLoading) aiLoading.hidden = true;
       if (aiQueryRow) aiQueryRow.hidden = false;
+      if (notice) notice.textContent = "";
       setDialogExpanded(false);
     }
 
@@ -360,6 +364,7 @@
     var turnstileScript = null;
     var turnstileWidget = null;
     function resetChallenge() {
+      if (challenge) challenge.hidden = true;
       if (window.turnstile && turnstileWidget !== null) window.turnstile.reset(turnstileWidget);
     }
     function challengeToken(signal) {
@@ -380,7 +385,7 @@
           var abort = function () { if (turnstileWidget !== null) { window.turnstile.remove(turnstileWidget); turnstileWidget = null; } reject(new Error("Aborted")); };
           signal.addEventListener("abort", abort, { once: true });
           var settle = function (fn, value) { signal.removeEventListener("abort", abort); fn(value); };
-          turnstileWidget = window.turnstile.render(modal.querySelector('[data-turnstile-container]'), {
+          turnstileWidget = window.turnstile.render(challenge, {
             sitekey: document.querySelector('meta[name="a2rt-turnstile-site-key"]').content,
             action: "docs_qa",
             theme: "light",
@@ -451,14 +456,18 @@
       var timer = setTimeout(function () { controller.abort(); }, 120000);
       setDialogExpanded(false);
       if (aiQueryRow) aiQueryRow.hidden = true;
-      if (aiLoading) aiLoading.hidden = false;
+      if (aiLoading) aiLoading.hidden = true;
+      if (challenge) challenge.hidden = false;
       if (answer) answer.hidden = true;
       if (answerText) answerText.textContent = "";
       if (sources) sources.hidden = true;
-      setNotice("loading");
+      setNotice("verifying");
       try {
         var token = await challengeToken(controller.signal);
         if (controller.signal.aborted) return;
+        if (challenge) challenge.hidden = true;
+        if (aiLoading) aiLoading.hidden = false;
+        setNotice("loading");
         var response = await fetch(apiUrl(), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
