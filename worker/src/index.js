@@ -131,7 +131,7 @@ export async function handle(request, env, dependencies = {}) {
       if (!verified.ok) throw new Error('Verification unavailable');
       verification = await verified.json();
     } catch { throw new HttpError(503, 'CHALLENGE_UNAVAILABLE'); }
-    if (!verification.success || verification.hostname !== new URL(env.ALLOWED_ORIGIN).hostname || verification.action !== 'docs_qa') throw new HttpError(403, 'CHALLENGE_FAILED');
+    if (verification.success !== true || verification.hostname !== new URL(env.ALLOWED_ORIGIN).hostname || verification.action !== 'docs_qa') throw new HttpError(403, 'CHALLENGE_FAILED');
     const index = await env.ASSETS.fetch(new Request(`https://assets.internal/index/chunks_${payload.language}.json`));
     if (!index.ok) throw new HttpError(503, 'INDEX_UNAVAILABLE');
     const ranked = await rank(payload.question, await index.json());

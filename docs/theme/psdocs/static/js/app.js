@@ -326,6 +326,7 @@
 
     function closeModal() {
       if (pendingRequest) { pendingRequest.abort(); pendingRequest = null; }
+      resetChallenge();
       modal.hidden = true;
       modal.setAttribute("aria-hidden", "true");
       document.documentElement.dataset.searchOpen = "false";
@@ -358,6 +359,9 @@
     var pendingRequest = null;
     var turnstileScript = null;
     var turnstileWidget = null;
+    function resetChallenge() {
+      if (window.turnstile && turnstileWidget !== null) window.turnstile.reset(turnstileWidget);
+    }
     function challengeToken(signal) {
       if (!turnstileScript) {
         turnstileScript = new Promise(function (resolve, reject) {
@@ -479,7 +483,13 @@
         if (pendingRequest === controller && !modal.hidden) { setNotice("error"); if (aiQueryRow) aiQueryRow.hidden = false; }
       } finally {
         clearTimeout(timer);
-        if (pendingRequest === controller) { pendingRequest = null; if (aiLoading) aiLoading.hidden = true; }
+        if (pendingRequest === controller) {
+          // Siteverify tokens are single-use, including failed submissions.
+          // Never reset a newer request's widget from an older request.
+          resetChallenge();
+          pendingRequest = null;
+          if (aiLoading) aiLoading.hidden = true;
+        }
       }
     }
 

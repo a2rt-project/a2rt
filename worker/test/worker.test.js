@@ -57,12 +57,38 @@ test('body size is enforced on actual bytes even without Content-Length', async 
   assert.equal(response.status, 413);
 });
 test('Turnstile success, expected hostname, and action are all required', async () => {
-  for (const verification of [{ success: false }, { hostname: 'evil.invalid' }, { action: 'something_else' }]) {
+  for (const verification of [{ success: false }, { success: 'true' }, { success: 1 }, { hostname: 'evil.invalid' }, { hostname: 'localhost' }, { action: 'something_else' }]) {
     const calls = [];
     const response = await handle(request(), environment(), { fetch: upstream(calls, verification) });
     assert.equal(response.status, 403);
     assert.equal(calls.length, 1);
   }
+});
+test('missing Turnstile secret or token cannot reach the model', async () => {
+  const neverFetch = () => assert.fail('Unverified requests must not call the network');
+  assert.equal((await handle(request(), environment({ TURNSTILE_SECRET_KEY: '' }), { fetch: neverFetch })).status, 503);
+  const response = await handle(request({ ...payload, turnstileToken: '' }), environment(), { fetch: neverFetch });
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: 'CHALLENGE_REQUIRED' });
+});
+test('Siteverify replay rejection prevents a second model call', async () => {
+  const used = new Set();
+  let modelCalls = 0;
+  const fetcher = async (url, options) => {
+    if (String(url).includes('siteverify')) {
+      const token = JSON.parse(options.body).response;
+      if (used.has(token)) return Response.json({ success: false, 'error-codes': ['timeout-or-duplicate'] });
+      used.add(token);
+      return Response.json({ success: true, hostname: 'www.a2rt.org', action: 'docs_qa' });
+    }
+    modelCalls++;
+    return Response.json({ choices: [{ message: { content: 'A2RT documentation answer.' } }] });
+  };
+  assert.equal((await handle(request(), environment(), { fetch: fetcher })).status, 200);
+  const replay = await handle(request(), environment(), { fetch: fetcher });
+  assert.equal(replay.status, 403);
+  assert.deepEqual(await replay.json(), { error: 'CHALLENGE_FAILED' });
+  assert.equal(modelCalls, 1);
 });
 test('question is grounded in built docs; model credential stays upstream', async () => {
   const calls = [];

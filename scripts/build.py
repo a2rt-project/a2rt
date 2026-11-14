@@ -28,7 +28,9 @@ def config():
     result["base_path"] = "/" + os.environ.get("SITE_BASE_PATH", result["base_path"]).strip("/")
     result["base_path"] = result["base_path"].rstrip("/") + "/"
     for field, variable in [("ai_endpoint", "DOCS_AI_ENDPOINT"), ("turnstile_site_key", "TURNSTILE_SITE_KEY")]:
-        result[field] = os.environ.get(variable, result[field]).strip()
+        # Unset GitHub Actions Variables are passed as empty strings. Preserve
+        # the checked-in public defaults unless a nonempty override is supplied.
+        result[field] = os.environ.get(variable, "").strip() or result[field].strip()
     for field in ("origin", "ai_endpoint"):
         value = result[field]
         if value and (urlparse(value).scheme != "https" or not urlparse(value).netloc or urlparse(value).username):

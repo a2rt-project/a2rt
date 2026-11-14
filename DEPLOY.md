@@ -131,7 +131,11 @@ Worker 使用 Rate Limiting binding，每 IP 每 60 秒近似限制 10 次；这
 
 重新运行 Pages 工作流，文档搜索面板就会显示 AI 问答入口。没有这两个公开配置时，站点只提供本地全文搜索，不会尝试发送模型请求。
 
-也可在 `site.config.json` 中填写同名用途的 `ai_endpoint` 与 `turnstile_site_key`。Actions 的变量会优先覆盖它们，建议线上统一使用 Actions Variables。
+`site.config.json` 已保存现有 Turnstile 组件的公开 site key。非空的 Actions Variables 会优先覆盖 `ai_endpoint` 与 `turnstile_site_key`；未设置或空白的变量保留文件中的公开配置。
+Worker 就绪后设置 `DOCS_AI_ENDPOINT` 即可使用这个组件，无需重复创建。要隐藏 AI 入口，清空 Actions 的 endpoint 以及文件中的 `ai_endpoint`。
+
+该组件用于 Docs 问答，action 固定为 `docs_qa`，生产后端只接受 `www.a2rt.org` hostname。浏览器请求结束或关闭面板会重置组件，重试获取新 token；Worker 每次向 Siteverify 验证后才调用模型。
+单元测试模拟重复 token 被拒绝；上线验收还需用真实组件验证一次成功提交，再确认重放同一 token 返回 `CHALLENGE_FAILED`。未完成这一步不能视为真实链路验证成功。
 
 通过 UI 提交一个 A2RT 问题，确认返回答案和 `/docs/` 来源链接。密钥不应出现在浏览器请求、HTML 或 JavaScript 中。CORS 不是身份验证，不能代替 Turnstile 与限流。
 
