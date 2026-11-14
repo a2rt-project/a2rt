@@ -41,7 +41,7 @@ git push -u origin HEAD:main
 
 DNS 校验与证书签发完成后开启 **Enforce HTTPS**。若通过 Cloudflare 管理 `www` 的解析，初始连接 GitHub Pages 时可使用 DNS only，便于 Pages 校验和证书签发。
 
-Pages 工作流读取 `configure-pages` 输出的 origin 和 base path，因此在域名未绑定时，也可部署到 `https://a2rt-project.github.io/a2rt/`。绑定或变更域名后重新运行工作流，以同步 canonical URL、资源路径与 sitemap。
+Pages 工作流读取 `configure-pages` 输出的 host 和 base path，并使用 HTTPS 生成站点地址，因此在域名未绑定时，也可部署到 `https://a2rt-project.github.io/a2rt/`。这也避免自定义域名等待证书时，Pages 返回 HTTP 地址导致构建失败。绑定或变更域名后重新运行工作流，以同步 canonical URL、资源路径与 sitemap。
 
 `dist/CNAME` 只记录构建目标；使用 Actions 发布时，它不能代替 GitHub Pages 设置中的域名绑定。
 

@@ -34,7 +34,9 @@ jobs:
       - name: Build website, docs, and AI index
         run: python scripts/build.py
         env:
-          SITE_ORIGIN: ${{ steps.pages.outputs.origin }}
+          # Pages can report http while a custom domain awaits its certificate.
+          # The generated site's canonical URLs should always target HTTPS.
+          SITE_ORIGIN: https://${{ steps.pages.outputs.host }}
           SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           DOCS_AI_ENDPOINT: ${{ vars.DOCS_AI_ENDPOINT }}
           TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
