@@ -90,6 +90,23 @@ test('Siteverify replay rejection prevents a second model call', async () => {
   assert.deepEqual(await replay.json(), { error: 'CHALLENGE_FAILED' });
   assert.equal(modelCalls, 1);
 });
+test('upstream redirects are rejected without forwarding credentials', async () => {
+  for (const redirectTarget of ['siteverify', 'model']) {
+    let calls = 0;
+    const response = await handle(request(), environment(), {
+      fetch: async (url, options) => {
+        calls++;
+        assert.equal(options.redirect, 'manual');
+        if (redirectTarget === 'siteverify' || !String(url).includes('siteverify')) {
+          return new Response(null, { status: 307, headers: { Location: 'https://elsewhere.invalid/collect' } });
+        }
+        return Response.json({ success: true, hostname: 'www.a2rt.org', action: 'docs_qa' });
+      },
+    });
+    assert.equal(response.status, redirectTarget === 'siteverify' ? 503 : 502);
+    assert.equal(calls, redirectTarget === 'siteverify' ? 1 : 2);
+  }
+});
 test('question is grounded in built docs; model credential stays upstream', async () => {
   const calls = [];
   const response = await handle(request(), environment(), { fetch: upstream(calls) });
@@ -99,7 +116,7 @@ test('question is grounded in built docs; model credential stays upstream', asyn
   const model = calls.find(call => call.url.includes('provider.invalid'));
   assert.equal(model.url, 'https://provider.invalid/v1/chat/completions');
   assert.equal(model.options.headers.Authorization, 'Bearer fixture-only-model-secret');
-  assert.equal(model.options.redirect, 'error');
+  assert.equal(model.options.redirect, 'manual');
   const sent = JSON.parse(model.options.body);
   assert.equal(sent.stream, false);
   assert.equal(sent.max_tokens, 1024);

@@ -124,7 +124,9 @@ export async function handle(request, env, dependencies = {}) {
     let verification;
     try {
       const verified = await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, redirect: 'error',
+        // Workers supports manual redirects, not redirect: 'error'.
+        // The status check below rejects 3xx without forwarding credentials.
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, redirect: 'manual',
         body: JSON.stringify({ secret: env.TURNSTILE_SECRET_KEY, response: payload.token, remoteip: ip }),
         signal: AbortSignal.timeout(8000),
       });
@@ -149,7 +151,7 @@ export async function handle(request, env, dependencies = {}) {
     }
     const modelUrl = upstreamUrl(env.AI_QA_BASE_URL);
     const upstream = await fetcher(modelUrl, {
-      method: 'POST', redirect: 'error', signal: AbortSignal.timeout(30000),
+      method: 'POST', redirect: 'manual', signal: AbortSignal.timeout(30000),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.AI_QA_API_KEY}` },
       body: JSON.stringify({
         model: env.AI_QA_MODEL, stream: false, max_tokens: MAX_OUTPUT_TOKENS,
