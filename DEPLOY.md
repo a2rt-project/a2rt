@@ -4,6 +4,7 @@
 
 当前后端为 `a2rt-docs-ai`，公开接口地址为 `https://a2rt-docs-ai.zmgithub.workers.dev/api/ai-qa/chat`。
 模型配置为 DeepSeek 的 `deepseek-flash`，调用 `https://api.deepseek.com/chat/completions`，关闭思考模式以将小额输出预算用于文档回答。
+当前生产配置已启用 AI；两项私密密钥仅保存在 Cloudflare Worker Secrets 中。
 后续如绑定 `api.a2rt.org`，同步更新站点的 `ai_endpoint` 或 Actions 的 `DOCS_AI_ENDPOINT` 即可。
 
 ## 1. GitHub Pages
@@ -62,7 +63,7 @@ npx wrangler login
 npm run deploy
 ```
 
-首次部署保持 `AI_QA_ENABLED=false`，不会产生模型调用。健康检查路径为 `/api/ai-qa/healthz`，尚未配置时返回 `configured: false`。
+在新账号首次部署时，先将 `AI_QA_ENABLED` 改为字符串 `false`，避免配置完成前产生模型调用。健康检查路径为 `/api/ai-qa/healthz`，尚未配置时返回 `configured: false`。
 
 在 Worker 的 **Settings → Variables and Secrets** 中添加两个 **Secret**：
 
@@ -82,7 +83,7 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 
 ## 4. Turnstile 与模型参数
 
-在 Cloudflare 创建 Turnstile widget，允许 hostname `www.a2rt.org`。前端会按需加载 widget，并使用 action `docs_qa`；Worker 验证 success、hostname 和 action。Site key 可以公开，secret key 必须只存 Worker。
+当前项目已接入现有 Turnstile widget，无需重新创建。迁移到新账号时，为 widget 允许 hostname `www.a2rt.org`。前端会按需加载 widget，并使用 action `docs_qa`；Worker 验证 success、hostname 和 action。Site key 可以公开，secret key 必须只存 Worker。
 
 编辑 `worker/wrangler.jsonc` 的普通变量：
 
@@ -126,17 +127,17 @@ Worker 使用 Rate Limiting binding，每 IP 每 60 秒近似限制 10 次；这
 
 ## 6. 在 Docs 中启用 AI
 
-确认 Worker 已部署、`configured: true` 且模型和 Turnstile 可用后，在 GitHub **Settings → Secrets and variables → Actions → Variables** 中设置：
+`site.config.json` 已保存当前 Worker 的公开接口与 Turnstile site key，Pages 构建会直接使用它们。若要覆盖配置，在 GitHub **Settings → Secrets and variables → Actions → Variables** 中设置：
 
 | Variable | 值 |
 | --- | --- |
-| `DOCS_AI_ENDPOINT` | `https://api.a2rt.org/api/ai-qa/chat` |
+| `DOCS_AI_ENDPOINT` | `https://a2rt-docs-ai.zmgithub.workers.dev/api/ai-qa/chat`（绑定自定义域名后可替换） |
 | `TURNSTILE_SITE_KEY` | Turnstile 的公开 site key |
 
 重新运行 Pages 工作流，文档搜索面板就会显示 AI 问答入口。没有这两个公开配置时，站点只提供本地全文搜索，不会尝试发送模型请求。
 
-`site.config.json` 已保存现有 Turnstile 组件的公开 site key。非空的 Actions Variables 会优先覆盖 `ai_endpoint` 与 `turnstile_site_key`；未设置或空白的变量保留文件中的公开配置。
-Worker 就绪后设置 `DOCS_AI_ENDPOINT` 即可使用这个组件，无需重复创建。要隐藏 AI 入口，清空 Actions 的 endpoint 以及文件中的 `ai_endpoint`。
+非空的 Actions Variables 会优先覆盖 `ai_endpoint` 与 `turnstile_site_key`；未设置或空白的变量保留文件中的公开配置。
+要隐藏 AI 入口，清空 Actions 的 endpoint 以及文件中的 `ai_endpoint`。
 
 该组件用于 Docs 问答，action 固定为 `docs_qa`，生产后端只接受 `www.a2rt.org` hostname。浏览器请求结束或关闭面板会重置组件，重试获取新 token；Worker 每次向 Siteverify 验证后才调用模型。
 单元测试模拟重复 token 被拒绝；上线验收还需用真实组件验证一次成功提交，再确认重放同一 token 返回 `CHALLENGE_FAILED`。未完成这一步不能视为真实链路验证成功。

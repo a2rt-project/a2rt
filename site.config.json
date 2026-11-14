@@ -3,6 +3,6 @@
   "base_path": "/",
   "repository": "https://github.com/a2rt-project/a2rt",
   "version": "0.2",
-  "ai_endpoint": "",
+  "ai_endpoint": "https://a2rt-docs-ai.zmgithub.workers.dev/api/ai-qa/chat",
   "turnstile_site_key": "0x4AAAAAAGBPqTietbCAsptD"
 }
