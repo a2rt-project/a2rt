@@ -140,7 +140,8 @@ Worker 使用 Rate Limiting binding，每 IP 每 60 秒近似限制 10 次；这
 要隐藏 AI 入口，清空 Actions 的 endpoint 以及文件中的 `ai_endpoint`。
 
 该组件用于 Docs 问答，action 固定为 `docs_qa`，生产后端只接受 `www.a2rt.org` hostname。浏览器请求结束或关闭面板会重置组件，重试获取新 token；Worker 每次向 Siteverify 验证后才调用模型。
-单元测试模拟重复 token 被拒绝；上线验收还需用真实组件验证一次成功提交，再确认重放同一 token 返回 `CHALLENGE_FAILED`。未完成这一步不能视为真实链路验证成功。
+单元测试覆盖重复 token 被拒绝。2026-11-15 已在生产域名使用真实组件完成验收：DeepSeek 返回文档回答与来源，首次请求为 HTTP 200；同一 token 经同一后端再次验证返回 HTTP 403 `CHALLENGE_FAILED`。验收后已移除临时检查入口并恢复正式 Worker。
+更换组件、密钥或验证逻辑后，需要重新执行真实提交与重放检查；健康检查和单元测试不能代替这项验收。
 
 通过 UI 提交一个 A2RT 问题，确认返回答案和 `/docs/` 来源链接。密钥不应出现在浏览器请求、HTML 或 JavaScript 中。CORS 不是身份验证，不能代替 Turnstile 与限流。
 
