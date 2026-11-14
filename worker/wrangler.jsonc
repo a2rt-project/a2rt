@@ -12,7 +12,7 @@
   "vars": {
     "AI_QA_ENABLED": "false",
     "AI_QA_BASE_URL": "https://api.deepseek.com",
-    "AI_QA_MODEL": "",
+    "AI_QA_MODEL": "deepseek-flash",
     "AI_QA_DOCS_URL_PREFIX": "https://www.a2rt.org/docs",
     "ALLOWED_ORIGIN": "https://www.a2rt.org"
   },

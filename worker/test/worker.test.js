@@ -111,6 +111,17 @@ test('provider errors are sanitized and carry no key or provider response body',
   assert.equal(response.status, 502);
   assert.deepEqual(await response.json(), { error: 'MODEL_UNAVAILABLE' });
 });
+test('DeepSeek uses non-thinking mode without changing other providers', async () => {
+  for (const base of ['https://api.deepseek.com', 'https://provider.invalid/v1']) {
+    const calls = [];
+    const response = await handle(request(), environment({ AI_QA_BASE_URL: base, AI_QA_MODEL: 'deepseek-flash' }), { fetch: upstream(calls) });
+    assert.equal(response.status, 200);
+    const sent = JSON.parse(calls[1].options.body);
+    assert.equal(sent.model, 'deepseek-flash');
+    if (base === 'https://api.deepseek.com') assert.deepEqual(sent.thinking, { type: 'disabled' });
+    else assert.equal(sent.thinking, undefined);
+  }
+});
 test('server rejects credentials in upstream URLs', async () => {
   const calls = [];
   const response = await handle(request(), environment({ AI_QA_BASE_URL: 'https://user:pass@provider.invalid/v1' }), { fetch: upstream(calls) });

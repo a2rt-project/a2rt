@@ -2,6 +2,10 @@
 
 默认目标是 `https://www.a2rt.org/`，文档入口是 `/docs/`。浏览器只读取静态页面；AI 问答由独立 Cloudflare Worker 提供。
 
+当前后端为 `a2rt-docs-ai`，公开接口地址为 `https://a2rt-docs-ai.zmgithub.workers.dev/api/ai-qa/chat`。
+模型配置为 DeepSeek 的 `deepseek-flash`，调用 `https://api.deepseek.com/chat/completions`，关闭思考模式以将小额输出预算用于文档回答。
+后续如绑定 `api.a2rt.org`，同步更新站点的 `ai_endpoint` 或 Actions 的 `DOCS_AI_ENDPOINT` 即可。
+
 ## 1. GitHub Pages
 
 在 `a2rt-project/a2rt` 的 **Settings → Pages** 中，将 **Source** 设置为 **GitHub Actions**。
