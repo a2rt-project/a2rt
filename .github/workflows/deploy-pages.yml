@@ -1,0 +1,99 @@
+name: Deploy A2RT to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - run: python -m pip install -r requirements.txt
+      - run: python protocol/validate_examples.py
+      - name: Build website, docs, and AI index
+        run: python scripts/build.py
+        env:
+          SITE_ORIGIN: ${{ steps.pages.outputs.origin }}
+          SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          DOCS_AI_ENDPOINT: ${{ vars.DOCS_AI_ENDPOINT }}
+          TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+      - name: Check public links and assets
+        run: python scripts/check_site.py
+        env:
+          SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+      - run: npm ci
+        working-directory: worker
+      - run: npm test
+        working-directory: worker
+      - run: npm run check
+        working-directory: worker
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Upload matching Worker index
+        if: vars.DEPLOY_AI_WORKER == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: worker-index
+          path: worker/assets
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  deploy-worker:
+    needs: [build, deploy]
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_AI_WORKER == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: worker-index
+          path: worker/assets
+      - run: npm ci
+        working-directory: worker
+      - name: Deploy configured Worker and index
+        run: npm run deploy
+        working-directory: worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

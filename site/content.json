@@ -1,0 +1,89 @@
+{
+  "zh": {
+    "title": "A2RT — 智能体实时多模态交互协议",
+    "description": "A2RT 连接智能体与实时环境。六条独立逻辑轨道，明确的执行回执，可扩展的环境 Profile。探索 0.2 草案、JSON Schema 与完整消息示例。",
+    "skip": "跳到主要内容", "home": "首页", "menu": "展开导航", "navigation": "网站导航", "nav_protocol": "协议", "nav_architecture": "架构", "release": "v0.2 · 草案已发布",
+    "hero_first": "让智能体，", "hero_second": "与世界同步。",
+    "hero_description": "声音、画面、事件，各有自己的节奏。A2RT 用一套通用协议，让智能体持续感知环境、发出操作，并获得真实的执行反馈。",
+    "start": "开始阅读", "explore": "探索六条轨道", "hero_note": "厂商无关 · 环境可扩展 · 异步多模态",
+    "console_label": "六条逻辑轨道的交互示意", "illustration": "交互示意", "select_track": "选择轨道查看说明", "tracks_label": "LOGICAL TRACKS", "pause": "暂停", "play": "播放", "independent": "独立更新 / 因果关联", "track_details": "了解轨道语义", "console_caption": "点击轨道查看说明 · 时间仅作示意，不代表性能测量或固定频率",
+    "tracks": [
+      {"id":"assistant.audio","symbol":"∿","color":"green","type":"wave","description":"智能体的声音独立流式交付；无需等待下一次操作，也不强制每条事件附带音频。"},
+      {"id":"assistant.events","symbol":"⌁","color":"green","type":"events","description":"每个 output 恰好包含一个事件。Profile 决定发送窗口，连续操作可以有多个事件在途。"},
+      {"id":"environment.audio","symbol":"∿","color":"blue","type":"wave","description":"人的声音、其他参与者与设备音频独立到达，保留来源时钟和实际采样范围。"},
+      {"id":"environment.events","symbol":"⌁","color":"blue","type":"events","description":"记录人或环境中已发生的事件。它们是观察到的事实，不应再次发送给执行器执行。"},
+      {"id":"environment.visual","symbol":"▧","color":"purple","type":"visual","description":"画面保留采集时刻和关联状态版本。视觉晚到时，已就绪的声音与回执仍可先交付。"},
+      {"id":"environment.state","symbol":"≡","color":"teal","type":"state","description":"承载真实执行回执、领域状态与播放进度。accepted 不等于成功，完成状态由执行器确认。"}
+    ],
+    "strip_one":"06 条逻辑轨道", "strip_two":"CORE + ENVIRONMENT PROFILES", "strip_three":"就绪即交付，不等待全部模态",
+    "protocol_title":"世界持续发生，交互也应如此。", "protocol_intro":"实时环境不会等待一次对话结束。A2RT 将感知、操作和反馈分开推进，同时保留它们之间的时间、来源与因果关系。",
+    "principles":[
+      {"title":"各自流动，局部同步","body":"音频先到就先交付，画面晚到就保留真实时间。只有声明了依赖的声音和操作需要相互等待。"},
+      {"title":"请求之后，必须有事实","body":"事件描述想要做什么，回执说明实际发生了什么。通过 event_id 关联进展、失败和真实终态。"},
+      {"title":"通用核心，具体环境","body":"Core 固定生命周期与交互语义。Profile 声明领域能力，Adapter 将能力映射到真实应用或设备。"}
+    ],
+    "architecture_title":"一套核心，\n连接不同环境。", "architecture_intro":"把稳定的交互规则留在核心，把领域差异交给明确的扩展层。为网页、协作画布、桌面与仿真环境定义各自的能力。", "architecture_link":"阅读核心与 Profile 规范", "architecture_note":"这些是协议可适配的环境方向；当前草案不包含已上线的领域适配器。",
+    "layers":[
+      {"name":"A2RT Core","subtitle":"定义交互的共同语言","body":"统一消息、逻辑轨道、身份引用、来源时间、操作边界，以及执行回执和恢复语义。","tags":["Event","TrackUpdate","Receipt"]},
+      {"name":"Environment Profile","subtitle":"声明一个环境能做什么","body":"注册自定义事件、状态 Schema、工具和具名执行策略。能力清单在 epoch 内冻结，并保留内容哈希。","tags":["Schemas","Capabilities","Policy"]},
+      {"name":"Adapter","subtitle":"把请求变为真实执行","body":"连接真实应用或设备，检查当前状态和权限，产生可信观察与执行回执。模型不能自证操作成功。","tags":["Execution","Observation","Cleanup"]},
+      {"name":"Binding","subtitle":"负责可靠、安全的交付","body":"处理连接、鉴权、资源寻址和流控。具体传输绑定需要独立定义；使用 WebSocket 不自动代表兼容 A2RT。","tags":["Transport","Auth","Media"]}
+    ],
+    "example_title":"协议，可以直接读。", "example_intro":"从一个非画布计数器环境入手，查看真实 fixture 中的输出、反馈与会话清单。示例可用仓库内校验器复核。", "example_tabs":"消息示例类型", "copy":"复制", "copied":"已复制", "copy_failed":"请手动选择复制", "fixture":"来自 v0.2 校验示例", "download":"完整记录", "example_kicker":"EXPLICIT BY DESIGN",
+    "example_notes":[
+      {"title":"明确的来源与版本","body":"session_id、epoch 和 manifest_id 标识本次会话上下文；sent_at 保留来源时钟。"},
+      {"title":"事件窗口与操作名额分开","body":"同一次操作可以连续发送多个事件。收到首个真实回执释放事件窗口，真实终态才释放操作名额。"},
+      {"title":"异步交付，持续关联","body":"同一请求可以先收到 accepted，再收到 completed。每次进展都通过 event_id 与 revision 对账。"}
+    ],
+    "all_examples":"查看示例与校验方法", "faq_title":"开始之前，\n你可能想知道。",
+    "faq":[
+      {"question":"A2RT 现在可以直接用于生产吗？","answer":"当前版本是 0.2 协议草案，交付包括规范、JSON Schema、消息示例和文档校验器。它不是生产 SDK，也尚未提供完整传输绑定或生产级执行器。"},
+      {"question":"必须同时启用六条轨道吗？","answer":"不需要。六条轨道是逻辑分类，按能力启用，并非六条连接。基础闭环需要 assistant.events，以及 environment.state 中分别承载 core.result 和 core.control_result 的 stream。"},
+      {"question":"A2RT 和 MCP 是什么关系？","answer":"MCP 可以作为工具接入方式之一，由适配器处理其握手、鉴权与调用。A2RT 负责实时环境的事件、媒体、观察和执行反馈；二者的映射需要明确设计，不能仅包一层 JSON 就宣称兼容。"},
+      {"question":"协议保证固定帧率或毫秒级截止时间吗？","answer":"不保证。A2RT 不固定帧率、采样率或全局时间窗口，也没有硬实时截止保证。实际时延、吞吐、媒体同步误差和恢复行为需要具体实现的工程验收。"}
+    ],
+    "closing_title":"让下一次交互，有据可循。", "closing_body":"从协议草案开始，一起定义智能体与实时环境之间的连接。", "read_docs":"阅读文档", "contribute":"参与讨论", "footer_navigation":"页脚导航", "footer_note":"0.2 草案 · 规范、Schema 与可复核示例", "back_top":"回到顶部"
+  },
+  "en": {
+    "title":"A2RT — Agent-to-Real-Time Protocol", "description":"A protocol for agents interacting with real-time environments. Six independent logical tracks, explicit execution receipts, and extensible environment profiles. Explore the 0.2 draft.",
+    "skip":"Skip to content", "home":"Home", "menu":"Toggle navigation", "navigation":"Main navigation", "nav_protocol":"Protocol", "nav_architecture":"Architecture", "release":"v0.2 · Draft available",
+    "hero_first":"Intelligence.", "hero_second":"In real time.", "hero_description":"Audio, visuals, and events move at their own pace. A2RT gives agents a common protocol to observe, act, and receive truthful feedback from a changing world.", "start":"Read the docs", "explore":"Explore the tracks", "hero_note":"Vendor-neutral · Extensible · Asynchronous",
+    "console_label":"Interactive illustration of six logical tracks", "illustration":"ILLUSTRATION", "select_track":"Select a track to learn more", "tracks_label":"LOGICAL TRACKS", "pause":"Pause", "play":"Play", "independent":"Independent. Causally linked.", "track_details":"Explore track semantics", "console_caption":"Select a track to explore · Illustrative timing, not a performance benchmark",
+    "tracks":[
+      {"id":"assistant.audio","symbol":"∿","color":"green","type":"wave","description":"Agent audio streams independently. A chunk need not wait for an action, and an action need not carry audio."},
+      {"id":"assistant.events","symbol":"⌁","color":"green","type":"events","description":"Each output carries one event. A Profile defines the sending window; one operation may have multiple events in flight."},
+      {"id":"environment.audio","symbol":"∿","color":"blue","type":"wave","description":"People, participants, and devices contribute audio with explicit source clocks and sample ranges."},
+      {"id":"environment.events","symbol":"⌁","color":"blue","type":"events","description":"Events that have already happened in the environment. These observed facts must never be executed again."},
+      {"id":"environment.visual","symbol":"▧","color":"purple","type":"visual","description":"Visuals keep their capture time and source state references. Late visuals do not block ready audio or receipts."},
+      {"id":"environment.state","symbol":"≡","color":"teal","type":"state","description":"Real execution receipts, domain state, and playback progress. Acceptance is not success; the executor confirms completion."}
+    ],
+    "strip_one":"06 LOGICAL TRACKS", "strip_two":"CORE + ENVIRONMENT PROFILES", "strip_three":"DELIVER WHEN READY",
+    "protocol_title":"The world keeps moving. So should interaction.", "protocol_intro":"A real-time environment does not wait for a conversation turn to end. A2RT lets observation, action, and feedback progress independently, with time, provenance, and causality intact.",
+    "principles":[
+      {"title":"Independent by default","body":"Deliver audio as it arrives. Preserve the timestamp of a late frame. Synchronize only the media and events with declared dependencies."},
+      {"title":"Requests meet reality","body":"An event says what should happen. A receipt says what actually happened. Link progress, failures, and terminal outcomes through event_id."},
+      {"title":"One core. Many environments.","body":"Core defines the lifecycle and interaction semantics. Profiles declare domain capabilities. Adapters connect them to real applications and devices."}
+    ],
+    "architecture_title":"A shared foundation.\nRoom for your world.", "architecture_intro":"Keep stable interaction rules in the core, and domain differences in explicit extensions. Define capabilities for browsers, canvases, desktops, or simulations.", "architecture_link":"Read Core & Profiles", "architecture_note":"These are possible adaptation directions. The draft does not ship production adapters for these environments.",
+    "layers":[
+      {"name":"A2RT Core","subtitle":"A common language for interaction","body":"Messages, logical tracks, identity references, source clocks, operation boundaries, execution receipts, and recovery semantics.","tags":["Event","TrackUpdate","Receipt"]},
+      {"name":"Environment Profile","subtitle":"Declare what an environment can do","body":"Register domain events, state schemas, tools, and named execution policies. A manifest freezes capabilities and content hashes within an epoch.","tags":["Schemas","Capabilities","Policy"]},
+      {"name":"Adapter","subtitle":"Turn requests into real execution","body":"Connect to an application or device, check permissions and actual state, and report observations and execution receipts. An agent cannot certify its own success.","tags":["Execution","Observation","Cleanup"]},
+      {"name":"Binding","subtitle":"Deliver reliably and securely","body":"Connections, authentication, media addressing, and flow control. Each transport needs an explicit binding; a WebSocket alone is not A2RT compatibility.","tags":["Transport","Auth","Media"]}
+    ],
+    "example_title":"A protocol you can read.", "example_intro":"Explore an output, feedback, and session manifest from the counter-environment fixture. Check the complete records with the repository validator.", "example_tabs":"Message example type", "copy":"Copy", "copied":"Copied", "copy_failed":"Select to copy", "fixture":"From the v0.2 fixtures", "download":"Full trace", "example_kicker":"EXPLICIT BY DESIGN",
+    "example_notes":[
+      {"title":"Identity and version, explicit","body":"session_id, epoch, and manifest_id identify the session context. sent_at preserves the source clock."},
+      {"title":"Two separate limits","body":"Multiple events may belong to one operation. A first real receipt frees an event slot; a confirmed terminal state frees the operation slot."},
+      {"title":"Asynchronous. Still connected.","body":"A request can receive accepted and later completed. Associate each update through event_id and a monotonically increasing revision."}
+    ],
+    "all_examples":"Explore examples & validation", "faq_title":"Before you start building.",
+    "faq":[
+      {"question":"Is A2RT ready for production?","answer":"Version 0.2 is a protocol draft with a specification, JSON Schemas, fixtures, and a documentation validator. It is not a production SDK, transport binding, or complete runtime."},
+      {"question":"Do I need all six tracks?","answer":"No. Tracks are logical categories, enabled by capability, not six separate connections. The baseline loop requires assistant.events and separate environment.state streams for core.result and core.control_result."},
+      {"question":"How does A2RT relate to MCP?","answer":"MCP is an optional tool integration handled by an adapter. A2RT describes events, media, observations, and execution feedback in a real-time environment. A mapping needs explicit design; wrapping JSON does not establish compatibility."},
+      {"question":"Does the protocol guarantee fixed latency?","answer":"No. A2RT specifies neither a fixed frame rate nor a global timing window, and provides no hard real-time deadline guarantee. Latency, throughput, synchronization error, and recovery need implementation-level validation."}
+    ],
+    "closing_title":"Make the next interaction count.", "closing_body":"Start with the draft. Help shape the connection between agents and real-time environments.", "read_docs":"Read the docs", "contribute":"Join the discussion", "footer_navigation":"Footer navigation", "footer_note":"Draft 0.2 · Specification, schemas & verifiable examples", "back_top":"Back to top"
+  }
+}

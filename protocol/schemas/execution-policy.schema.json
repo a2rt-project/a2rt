@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:a2rt:0.2:execution-policy",
+  "type": "object",
+  "properties": {
+    "feedback_mode": {
+      "enum": [
+        "per_event",
+        "windowed"
+      ]
+    },
+    "max_inflight_events": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_active_operations": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "operation_scope": {
+      "enum": [
+        "actor",
+        "actor_context"
+      ]
+    }
+  },
+  "required": [
+    "feedback_mode",
+    "max_inflight_events",
+    "max_active_operations",
+    "operation_scope"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "feedback_mode": {
+            "const": "per_event"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "max_inflight_events": {
+            "const": 1
+          }
+        }
+      }
+    }
+  ]
+}

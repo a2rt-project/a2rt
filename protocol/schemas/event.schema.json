@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:a2rt:0.2:event",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "context_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "time": {
+      "type": "object",
+      "properties": {
+        "clock_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "t_us": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "clock_id",
+        "t_us"
+      ],
+      "additionalProperties": false
+    },
+    "operation_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "phase": {
+      "enum": [
+        "begin",
+        "update",
+        "end",
+        "cancel",
+        "single",
+        "none"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "timing": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "const": "immediate"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "const": "audio"
+            },
+            "stream_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sample": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "late_policy": {
+              "enum": [
+                "reject",
+                "apply_now"
+              ]
+            }
+          },
+          "required": [
+            "mode",
+            "stream_id",
+            "sample",
+            "late_policy"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": [
+    "event_id",
+    "actor_id",
+    "context_id",
+    "time",
+    "operation_id",
+    "phase",
+    "type",
+    "payload",
+    "timing"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "core.noop"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operation_id": {
+            "type": "null"
+          },
+          "phase": {
+            "const": "none"
+          },
+          "payload": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "additionalProperties": false
+          },
+          "timing": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "const": "immediate"
+              }
+            },
+            "required": [
+              "mode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "phase": {
+            "enum": [
+              "begin",
+              "update",
+              "end",
+              "cancel",
+              "single"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "core.tool_call"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "phase": {
+            "const": "begin"
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "server_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "arguments": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "server_id",
+              "name",
+              "arguments"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ]
+}

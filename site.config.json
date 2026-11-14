@@ -1,0 +1,8 @@
+{
+  "origin": "https://www.a2rt.org",
+  "base_path": "/",
+  "repository": "https://github.com/a2rt-project/a2rt",
+  "version": "0.2",
+  "ai_endpoint": "",
+  "turnstile_site_key": ""
+}

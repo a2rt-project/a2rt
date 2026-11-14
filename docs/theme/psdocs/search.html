@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% set title = ps_ui.search_docs %}
+{% block extrahead %}
+  <meta name="robots" content="noindex">
+  <meta name="a2rt-search-index" content="{{ a2rt_base }}docs/ai-index/chunks_{{ ps_current_language.code }}.json">
+  <meta name="a2rt-docs-prefix" content="{{ a2rt_base }}docs">
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ pathto('_static/js/search.js', 1) }}" defer></script>
+{% endblock %}
+{% block body %}
+  <h1 id="search-documentation">{{ ps_ui.search_docs }}</h1>
+  <p>{{ '在 A2RT 规范与指南中查找关键词。' if ps_current_language.code == 'zh' else 'Find keywords in the A2RT specification and guides.' }}</p>
+  <form class="a2rt-search-form" action="" method="get" role="search">
+    <input type="search" name="q" aria-labelledby="search-documentation" placeholder="{{ '例如：回执、轨道、event_id' if ps_current_language.code == 'zh' else 'Try: receipts, tracks, event_id' }}" required>
+    <button type="submit">{{ ps_ui.search_docs }} →</button>
+  </form>
+  <p data-search-status role="status"></p>
+  <div id="search-results" data-search-results></div>
+  <noscript><p>{{ '请启用 JavaScript 使用本地全文搜索，或通过侧栏浏览文档。' if ps_current_language.code == 'zh' else 'Enable JavaScript for local search, or browse the sidebar.' }}</p></noscript>
+{% endblock %}

@@ -1,0 +1,3 @@
+# Copy to .dev.vars for local Worker testing only. Never commit real keys.
+AI_QA_API_KEY=
+TURNSTILE_SECRET_KEY=
