@@ -2,10 +2,10 @@
 
 默认目标是 `https://www.a2rt.org/`，文档入口是 `/docs/`。浏览器只读取静态页面；AI 问答由独立 Cloudflare Worker 提供。
 
-当前后端为 `a2rt-docs-ai`，公开接口地址为 `https://a2rt-docs-ai.zmgithub.workers.dev/api/ai-qa/chat`。
+当前后端为 `a2rt-docs-ai`，公开接口地址为 `https://api.a2rt.org/api/ai-qa/chat`。
 模型配置为 DeepSeek 的 `deepseek-flash`，调用 `https://api.deepseek.com/chat/completions`，关闭思考模式以将小额输出预算用于文档回答。
 当前生产配置已启用 AI；两项私密密钥仅保存在 Cloudflare Worker Secrets 中。
-后续如绑定 `api.a2rt.org`，同步更新站点的 `ai_endpoint` 或 Actions 的 `DOCS_AI_ENDPOINT` 即可。
+`api.a2rt.org` 已绑定为 Worker Custom Domain，DNS 和 HTTPS 由 Cloudflare 管理；原 `workers.dev` 地址保留可用。
 
 ## 1. GitHub Pages
 
@@ -111,9 +111,7 @@ Worker 使用 Rate Limiting binding，每 IP 每 60 秒近似限制 10 次；这
 
 ## 5. Worker 域名
 
-`a2rt.org` 的 Zone 在 Cloudflare 激活后，在 Worker 的 **Settings → Domains & Routes → Add → Custom Domain** 中绑定 `api.a2rt.org`。Cloudflare 会建立该主机的 DNS 记录。
-
-若希望把域名绑定也纳入代码，可在 `worker/wrangler.jsonc` 增加：
+当前已将 `api.a2rt.org` 绑定到 `a2rt-docs-ai`。`worker/wrangler.jsonc` 已包含以下配置，后续部署会继续维护该绑定：
 
 ```json
 "routes": [
@@ -121,7 +119,8 @@ Worker 使用 Rate Limiting binding，每 IP 每 60 秒近似限制 10 次；这
 ]
 ```
 
-在 Zone 尚未接入 Cloudflare 时，可先使用首次部署得到的 `workers.dev` 地址。不要通过将整个 `www.a2rt.org` 绑定到 Worker 的方式覆盖 GitHub Pages。
+迁移到其他账号时，需要先激活 `a2rt.org` Zone，再部署上述配置；Cloudflare 会建立 DNS 记录并签发证书。也可在 Worker 的 **Settings → Domains & Routes → Add → Custom Domain** 中配置。
+健康检查为 `https://api.a2rt.org/api/ai-qa/healthz`。`www.a2rt.org` 继续服务 GitHub Pages 官网与文档，浏览器的允许来源与 Turnstile hostname 仍是 `www.a2rt.org`。
 
 参考：[Worker Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)。
 
@@ -131,7 +130,7 @@ Worker 使用 Rate Limiting binding，每 IP 每 60 秒近似限制 10 次；这
 
 | Variable | 值 |
 | --- | --- |
-| `DOCS_AI_ENDPOINT` | `https://a2rt-docs-ai.zmgithub.workers.dev/api/ai-qa/chat`（绑定自定义域名后可替换） |
+| `DOCS_AI_ENDPOINT` | `https://api.a2rt.org/api/ai-qa/chat` |
 | `TURNSTILE_SITE_KEY` | Turnstile 的公开 site key |
 
 重新运行 Pages 工作流，文档搜索面板就会显示 AI 问答入口。没有这两个公开配置时，站点只提供本地全文搜索，不会尝试发送模型请求。
