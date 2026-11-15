@@ -44,6 +44,7 @@ class ArticleParser(HTMLParser):
         self.heading_tag = ""
         self.heading_parts: list[str] = []
         self.block_tag = ""
+        self.block_depth = 0
         self.block_parts: list[str] = []
         self.blocks: list[TextBlock] = []
 
@@ -55,14 +56,19 @@ class ArticleParser(HTMLParser):
             self.article_depth = 1
             return
         if self.in_article:
+            if tag in {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}:
+                return
             self.article_depth += 1
             if tag == "section":
                 self.section_stack.append(attributes.get("id") or self.current_anchor)
             if tag in {"h1", "h2", "h3", "h4"}:
                 self.heading_tag = tag
                 self.heading_parts = []
-            if tag in {"p", "li", "pre", "td", "th"} and not self.block_tag:
+            # Keep each table row together so short labels such as Core and
+            # Profile remain attached to the responsibilities they describe.
+            if tag in {"p", "li", "pre", "tr"} and not self.block_tag:
                 self.block_tag = tag
+                self.block_depth = self.article_depth
                 self.block_parts = []
         if tag == "title":
             self.in_title = True
@@ -73,6 +79,10 @@ class ArticleParser(HTMLParser):
             self.in_title = False
         if not self.in_article:
             return
+        if tag == "article":
+            self.in_article = False
+            self.article_depth = 0
+            return
         if self.heading_tag and tag == self.heading_tag:
             heading = normalize_text(" ".join(self.heading_parts).replace("¶", ""))
             if heading:
@@ -80,7 +90,7 @@ class ArticleParser(HTMLParser):
                 self.current_anchor = self.section_stack[-1] if self.section_stack else ""
             self.heading_tag = ""
             self.heading_parts = []
-        if self.block_tag and tag == self.block_tag:
+        if self.block_tag and tag == self.block_tag and self.article_depth == self.block_depth:
             text = normalize_text(" ".join(self.block_parts))
             if len(text) >= MIN_BLOCK_CHARS:
                 self.blocks.append(TextBlock(text=text, section=self.current_section, anchor=self.current_anchor))
@@ -165,7 +175,7 @@ def build_chunks(language: str, html_root: Path) -> list[dict[str, Any]]:
                 return
             content = "\n".join(block.text for block in pending_blocks)
             first_block = pending_blocks[0]
-            chunk_id = hashlib.sha1(f"{language}:{html_file}:{len(chunks)}".encode("utf-8")).hexdigest()
+            chunk_id = hashlib.sha1(f"{language}:{html_file.relative_to(html_root)}:{len(chunks)}".encode("utf-8")).hexdigest()
             chunks.append({
                 "id": chunk_id,
                 "language": language,
@@ -182,7 +192,7 @@ def build_chunks(language: str, html_root: Path) -> list[dict[str, Any]]:
 
         for block in page.blocks:
             block_length = len(block.text)
-            if pending_blocks and pending_length + block_length > MAX_CHUNK_CHARS:
+            if pending_blocks and (pending_length + block_length > MAX_CHUNK_CHARS or block.anchor != pending_blocks[0].anchor):
                 flush()
             pending_blocks.append(block)
             pending_length += block_length

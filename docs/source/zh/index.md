@@ -1,29 +1,30 @@
 # A2RT 协议文档
 
-**Agent-to-Real-Time Protocol · 0.2 草案**
+**Agent-to-Real-Time Protocol · 架构设计草案 · 2026-11-16**
 
-A2RT 定义智能体与实时环境之间的事件、媒体、观察和执行反馈。各轨道独立更新，已就绪的信息立即交付，同时保留来源、时间与因果关系。
+A2RT 定义智能体与实时环境之间的信息承载与同步组织机制：标准根时钟提供共同刻度与容量，子时钟组织更新节拍，信息同步组组织共同窗口，自定义轨道承载角色、方向与内容。
 
 ```{note}
-当前交付为协议规范、JSON Schema、可校验示例和文档校验器。尚未提供生产 SDK、完整传输绑定或硬实时截止保证。
+当前文档描述架构设计。与之匹配的新线协议版本、完整机器定义和运行时尚未发布。配置片段用于说明关系，不代表已验证的运行时实现。
 ```
 
 ## 从这里开始
 
-第一次接触 A2RT，先读[协议概览](overview.md)和[快速入门](quickstart.md)。准备实现适配器时，再按顺序阅读核心规范。想直接看消息，打开[示例与校验](examples.md)。
+从[协议概览](overview.md)建立概念，再按[设计接入步骤](quickstart.md)确定时钟、分组与内容契约。[配置示例](examples.md)解释窗口和容量；[草案状态](changelog.md)说明当前交付范围。
 
-## 一个持续运行的闭环
+## 四层组织关系
 
-环境持续采集声音、画面和状态；智能体按 Profile 的策略发送事件；执行器报告真实进展。声音不必等待操作，回执不必等待画面，局部依赖仍须被明确满足。
+<img src="{{ base }}assets/clock-groups.svg" alt="根时钟、子时钟、同步组与轨道">
 
-| 你想了解 | 从哪里读起 |
+共同的时钟不自动产生共同等待。每个接收端按选定 Profile 判断自己的窗口是否可交付，其他同步组独立推进。Core 保留身份、时间与通用状态；播放、恢复、完整性和内容校验由 Profile 定义。
+
+| 阅读目标 | 文档 |
 | --- | --- |
-| 协议解决什么问题 | [协议概览](overview.md) |
-| 如何定义环境能力 | [核心与 Profile](spec/01-core-and-profiles.md) |
-| 如何表达不同步的音频和画面 | [轨道与时间](spec/02-tracks-and-time.md) |
-| 什么时候可以发送下一条事件 | [异步反馈与执行策略](spec/03-feedback-loop.md) |
-| 取消、超时、重连如何对账 | [执行与恢复](spec/04-execution-and-recovery.md) |
-| 消息字段和 Schema 在哪里 | [消息与校验](spec/05-wire-and-validation.md) |
+| 理解节拍、容量与每轨单帧 | [时钟、同步组与轨道](spec/01-clock-sync-group-track-model.md) |
+| 协商媒体及 JSON 内容契约 | [媒体类型与格式协商](spec/02-media-types-and-negotiation.md) |
+| 划分通用机制与领域实现 | [Core 与 Profile 职责](spec/03-core-profile-responsibilities.md) |
+| 区分系统通知和输出、任务、会话边界 | [system 与生命周期](spec/04-system-track-and-lifecycle.md) |
+| 查看画布场景的具体选择 | [Canvas 适配要求](profiles/canvas.md) |
 
 ```{toctree}
 :caption: 开始了解
@@ -39,11 +40,18 @@ quickstart
 :maxdepth: 1
 :hidden:
 
-spec/01-core-and-profiles
-spec/02-tracks-and-time
-spec/03-feedback-loop
-spec/04-execution-and-recovery
-spec/05-wire-and-validation
+spec/01-clock-sync-group-track-model
+spec/02-media-types-and-negotiation
+spec/03-core-profile-responsibilities
+spec/04-system-track-and-lifecycle
+```
+
+```{toctree}
+:caption: 应用 Profile
+:maxdepth: 1
+:hidden:
+
+profiles/canvas
 ```
 
 ```{toctree}

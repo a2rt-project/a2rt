@@ -51,13 +51,19 @@ def prepare_docs(cfg):
     # Generate the Chinese specification directly from its authoritative files.
     specs = source / "zh/spec"
     specs.mkdir(parents=True, exist_ok=True)
-    for original in sorted((ROOT / "protocol").glob("0[1-5]-*.md")):
-        body = original.read_text()
-        body = body.replace("[README](./README.md)", "[协议概览](../overview.md)")
-        body = body.replace("python3 docs/design/a2rt/validate_examples.py", "python3 protocol/validate_examples.py")
-        body = re.sub(r"\]\(\./(examples|schemas)/([^)]+)\)", lambda m: f"]({cfg['base_path']}protocol/{m[1]}/{m[2]})", body)
-        body = body.replace("与六轨网站不同，这里的记录", "这里的记录")
+    for original in sorted((ROOT / "protocol").glob("0[1-4]-*.md")):
+        body = original.read_text().replace("(./profiles/canvas/README.md)", "(../profiles/canvas.md)")
+        # CommonMark needs separation after punctuation-ending emphasis before
+        # adjacent CJK prose. Adapt rendering without modifying the source copy.
+        body = re.sub(r"([）”])\*\*(?=[\u4e00-\u9fff])", r"\1** ", body)
+        # Render the source's small architecture diagram without a JS/CDN dependency.
+        body = re.sub(r"```mermaid\n.*?```", f'<img src="{cfg["base_path"]}assets/clock-groups.svg" alt="根时钟、子时钟、独立同步组及其轨道">', body, flags=re.S)
         (specs / original.name).write_text(body)
+    profile = source / "zh/profiles/canvas.md"
+    profile.parent.mkdir(parents=True, exist_ok=True)
+    body = (ROOT / "protocol/profiles/canvas/README.md").read_text()
+    body = body.replace("(../../README.md)", "(../overview.md)")
+    profile.write_text(body)
     for page in source.rglob("*.md"):
         body = re.sub(r"\[([^\]]+)\]\((/[^)]+)\)", lambda m: '<a href="' + html.escape(m[2], quote=True) + '">' + html.escape(m[1]) + '</a>', page.read_text())
         page.write_text(body)
@@ -67,8 +73,11 @@ def prepare_docs(cfg):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--home-only", action="store_true", help="Quick landing-page preview; docs are built by the full command")
+    parser.add_argument("--preview", action="store_true", help="Use local search without calling the production AI Worker")
     args = parser.parse_args()
     cfg = config()
+    if args.preview:
+        cfg.update(ai_endpoint="", turnstile_site_key="")
     out = ROOT / "dist"
     if not args.home_only and out.exists():
         shutil.rmtree(out)
@@ -81,16 +90,18 @@ def main():
         (out / "CNAME").write_text(hostname + "\n")
 
     content = json.loads((ROOT / "site/content.json").read_text())
-    trace = json.loads((ROOT / "protocol/examples/streaming-session.json").read_text())
-    messages = trace if isinstance(trace, list) else trace["messages"]
+    chapter = (ROOT / "protocol/01-clock-sync-group-track-model.md").read_text()
+    illustration = json.loads(re.search(r"```json\s*\n(.*?)\n```", chapter, re.S)[1])
+    (out / "assets/architecture-example.json").write_text(json.dumps(illustration, indent=2, ensure_ascii=False) + "\n")
     examples = {
-        "output": next(m for m in messages if m["kind"] == "output"),
-        "feedback": next(m for m in messages if m["kind"] == "feedback" and any(u.get("data", {}).get("event_id") for u in m["updates"])),
-        "manifest": json.loads((ROOT / "protocol/examples/session.json").read_text()),
+        "clocks": illustration["clocks"][:2],
+        "group": illustration["sync_groups"][0],
+        "track": illustration["tracks"][0],
     }
     jinja = Environment(loader=FileSystemLoader(ROOT / "site"), autoescape=select_autoescape(["html"]))
     # Refresh cached styles and icons whenever their content changes.
     asset_hash = hashlib.sha256()
+    asset_hash.update(json.dumps(illustration, sort_keys=True).encode())
     for asset in sorted((ROOT / "site/assets").rglob("*")):
         if asset.is_file():
             asset_hash.update(asset.relative_to(ROOT / "site/assets").as_posix().encode())
@@ -98,12 +109,12 @@ def main():
     jinja.globals["asset_version"] = asset_hash.hexdigest()[:12]
     for lang, t in content.items():
         home = cfg["base_path"] + ("en/" if lang == "en" else "")
-        client = {"tracks": t["tracks"], "examples": examples, **{key: t[key] for key in ("copy", "copied", "copy_failed")}}
+        client = {"groups": t["groups"], "examples": examples, **{key: t[key] for key in ("copy", "copied", "copy_failed")}}
         rendered = jinja.get_template("home.html").render(
             t=t, lang=lang, home=home, origin=cfg["origin"], base=cfg["base_path"],
             canonical=cfg["origin"] + home, alternate=cfg["base_path"] + ("en/" if lang == "zh" else ""),
             docs=cfg["base_path"] + f"docs/{lang}/", repo=cfg["repository"], year=datetime.now(timezone.utc).year,
-            initial_example=json.dumps(examples["output"], indent=2, ensure_ascii=False),
+            initial_example=json.dumps(examples["clocks"], indent=2, ensure_ascii=False),
             client_data=json.dumps(client, ensure_ascii=False).replace("<", "\\u003c"),
         )
         target = out / ("en/index.html" if lang == "en" else "index.html")
@@ -128,7 +139,11 @@ def main():
     if asset_dir.exists():
         shutil.rmtree(asset_dir)
     shutil.copytree(ROOT / "build/ai/index", asset_dir)
-    (ROOT / "worker/assets/index/version.json").write_text(json.dumps({"protocol": "a2rt/0.2", "commit": os.environ.get("GITHUB_SHA", "local")}))
+    source_info = json.loads((ROOT / "protocol/SOURCE.json").read_text())
+    version = {key: source_info[key] for key in ("status", "revision", "wire_protocol_version", "source_commit")}
+    version["commit"] = os.environ.get("GITHUB_SHA") or subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    for location in (ROOT / "build/ai/index/version.json", asset_dir / "version.json"):
+        location.write_text(json.dumps(version, ensure_ascii=False, indent=2) + "\n")
     # Publish the exact same documentation index with Pages for inspection.
     shutil.copytree(ROOT / "build/ai/index", out / "docs/ai-index", dirs_exist_ok=True)
     urls = [cfg["origin"] + cfg["base_path"] + str(path.relative_to(out)).replace("index.html", "")

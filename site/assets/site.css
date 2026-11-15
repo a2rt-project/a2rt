@@ -355,3 +355,40 @@ h1{font-size:49px}
 @media(min-width:801px){.hero{min-height:740px}.hero-copy{padding-bottom:6px}}
 @media(max-width:800px){.hero{gap:58px}.hero:before{top:45%;width:100%;height:50%}}
 @media(max-width:540px){.hero{gap:46px}.hero-description{font-size:14px}.header .github-link{padding:10px 14px}.header nav.open{box-shadow:0 16px 24px #1b35200a}.signal-console{border-radius:10px}.console-top{border-radius:10px 10px 0 0}}
+
+/* Architecture illustration: shared root, independent groups, one slot per track. */
+.architecture-console .console-top{font-size:8px;letter-spacing:.4px}
+.root-clock{display:flex;align-items:center;gap:12px;padding:22px 20px;border-bottom:1px solid var(--line)}
+.clock-symbol{font-size:32px;color:var(--green);line-height:1}
+.root-clock strong{font:600 14px var(--mono);display:block}
+.root-clock strong span{font-size:11px;font-weight:400;margin-left:10px;color:var(--green)}
+.root-clock small{display:block;font:9px/1.6 var(--mono);color:var(--muted);margin-top:7px}
+.root-label{margin-left:auto;color:#708268;text-align:right;font:7px/1.8 var(--mono);letter-spacing:1px}
+.group-tabs{display:flex;gap:4px;padding:12px 16px 0;background:#f8faf5;border-bottom:1px solid var(--line)}
+.group-tabs button{flex:1;border:0;border-bottom:2px solid transparent;background:none;font:10px var(--mono);padding:10px 2px 12px;color:var(--muted)}
+.group-tabs button[aria-selected=true]{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+.group-panel{padding:17px 18px 0}
+.group-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font:9px/1.6 var(--mono);color:var(--muted)}
+.group-heading code{color:var(--green);font:inherit}
+.group-window-label{font:8px var(--mono);color:#71806c;margin-top:18px;text-align:right}
+.window-labels,.window-track{display:grid;grid-template-columns:145px minmax(0,1fr);gap:10px}
+.window-labels{font:7px var(--mono);color:#75816e;margin:10px 0 6px}
+.window-labels>div,.window-cells{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;text-align:center}
+.window-labels>span{font-size:6px;letter-spacing:.2px;align-self:center}
+.group-tracks{min-height:192px}
+.window-track{min-height:48px;align-items:center;border-top:1px solid #edf1e9}
+.window-track strong{display:block;font:9px var(--mono);color:#2c4935}
+.window-track small{display:block;font:7px/1.4 var(--mono);color:#71816a;margin-top:4px}
+.window-cell{border:1px solid #c8daba;border-radius:3px;background:#edf5e6;color:#456f37;font:8px/27px var(--mono)}
+.window-track:nth-child(3) .window-cell{border-color:#d0dfea;background:#f1f6fa;color:#526f87}
+.window-track:nth-child(4) .window-cell{border-color:#ddcfeb;background:#f7f3fa;color:#7c6490}
+.group-rule{font:9px/1.6 var(--mono);color:#607159;margin:10px 0 16px}
+.group-rule>span{color:var(--green)}
+.group-limits{display:grid;grid-template-columns:1fr 1fr;gap:14px;border-top:1px solid var(--line);padding:14px 0 18px}
+.group-limits small{display:block;font-size:9px;color:var(--muted)}
+.group-limits strong{display:block;font:600 20px var(--mono);color:#2f583a;margin-top:6px}
+.group-limits em{font:9px var(--sans);font-style:normal;color:var(--muted)}
+.architecture-console .track-inspector{min-height:132px}
+@media(max-width:1100px){.root-label{display:none}.window-labels,.window-track{grid-template-columns:123px minmax(0,1fr);gap:7px}.group-heading{font-size:8px}.hero h1{font-size:clamp(42px,4.7vw,62px)}}
+@media(max-width:800px){.hero h1{font-size:60px}.window-labels,.window-track{grid-template-columns:145px minmax(0,1fr)}}
+@media(max-width:540px){.hero h1{font-size:45px;letter-spacing:-1.8px}.root-clock{padding:18px 14px;gap:9px}.root-clock small{font-size:7px}.group-tabs{padding:10px 10px 0}.group-tabs button{font-size:8px}.group-panel{padding:14px 12px 0}.window-labels,.window-track{grid-template-columns:112px minmax(0,1fr);gap:6px}.window-cells,.window-labels>div{gap:3px}.window-track strong{font-size:8px}.window-track small{font-size:6px}.window-cell{font-size:6px}.window-labels{font-size:6px}.group-limits small{font-size:8px}.architecture-console .console-caption{font-size:8px}}

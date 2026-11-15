@@ -14,7 +14,7 @@ from markupsafe import Markup
 project = "A2RT"
 author = "A2RT Project"
 copyright = f"{datetime.now().year}, {author}"
-release = "0.2 draft"
+release = "Architecture draft · 2026-11-16"
 
 _LANGUAGE_ALIASES = {
     "zh": "zh_CN",
@@ -92,13 +92,13 @@ _UI_TEXT = {
     },
 }
 _SEARCH_EXAMPLES = {
-    "zh": ["A2RT 的六条轨道分别是什么？", "事件窗口和操作名额有什么区别？", "如何理解 accepted 和 completed？", "如何处理视觉晚于音频到达？"],
-    "en": ["What are the six logical tracks?", "How do event windows differ from operation limits?", "Does accepted mean completed?", "How are late visuals handled?"],
+    "zh": ["根时钟与同步组是什么关系？", "每轨每周期最多一个数据帧是什么意思？", "system 轨道必须独立成组吗？", "Core 与 Profile 各负责什么？"],
+    "en": ["How do root clocks and sync groups relate?", "What does one data frame per track per period mean?", "Must the system track have its own group?", "What do Core and Profiles each define?"],
 }
 _CONFIG = json.loads(os.environ["A2RT_SITE_CONFIG"])
 _AI_ENABLED = bool(_CONFIG["ai_endpoint"] and _CONFIG["turnstile_site_key"])
 if not _AI_ENABLED:
-    _SEARCH_EXAMPLES = {"zh": ["轨道", "回执", "执行策略", "event_id"], "en": ["tracks", "receipts", "execution policy", "event_id"]}
+    _SEARCH_EXAMPLES = {"zh": ["根时钟", "同步组", "system", "media_type"], "en": ["root clock", "sync groups", "system", "media_type"]}
     for code, label in [("zh", "搜索文档"), ("en", "Search docs")]:
         _UI_TEXT[code].update(search_or_ask=label, search_or_ask_ai=label, ai_label="", ask_ai=label)
 
@@ -230,10 +230,10 @@ html_js_files = ["js/app.js"]
 html_theme_options = {
     "brand_name": "A2RT Docs",
     "brand_short": "Docs",
-    "sidebar_title": "A2RT / 0.2 DRAFT",
+    "sidebar_title": "A2RT / ARCHITECTURE DRAFT",
     "repo_url": "https://github.com/a2rt-project/a2rt",
     "show_copy_md": "true",
-    "banner_text": "0.2 草案 · 规范与示例，不是生产 SDK。" if _LANGUAGE_CODE == "zh" else "Draft 0.2 · Specification and examples, not a production SDK.",
+    "banner_text": "架构设计草案 · 2026-11-16 · 新线协议与运行时尚未发布。" if _LANGUAGE_CODE == "zh" else "Architecture draft · 2026-11-16 · New wire version and runtime not yet released.",
     "banner_link_label": "",
     "banner_link_url": "",
 }
@@ -245,6 +245,8 @@ html_theme_options = {
 html_sidebars: dict[str, list[str]] = {"**": []}
 
 # -- MyST / Copybutton -------------------------------------------------------
+
+myst_heading_anchors = 4
 
 myst_enable_extensions = [
     "colon_fence",

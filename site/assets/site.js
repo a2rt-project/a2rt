@@ -8,42 +8,53 @@
   navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
   document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
 
-  document.querySelectorAll('[data-track]').forEach(button => button.addEventListener('click', () => {
-    document.querySelectorAll('[data-track]').forEach(item => { item.classList.remove('selected'); item.setAttribute('aria-pressed', 'false'); });
-    button.classList.add('selected'); button.setAttribute('aria-pressed', 'true');
-    const track = data.tracks[Number(button.dataset.track)];
-    document.querySelector('[data-track-title]').textContent = track.id;
-    document.querySelector('[data-track-description]').textContent = track.description;
-  }));
-
-  const playButton = document.querySelector('.play-toggle');
-  const grid = document.querySelector('.track-grid');
-  const clock = document.querySelector('.console-clock');
-  const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  let playing = !motion.matches, elapsed = 0, previous = 0, frame;
-  function updateButton() {
-    const label = playing ? playButton.dataset.pause : playButton.dataset.play;
-    playButton.setAttribute('aria-label', label);
-    document.querySelector('[data-play-label]').textContent = label;
-    document.querySelector('[data-play-icon]').textContent = playing ? 'Ⅱ' : '▷';
+  const groupTabs = [...document.querySelectorAll('[data-group]')];
+  function showGroup(button) {
+    const group = data.groups[Number(button.dataset.group)];
+    groupTabs.forEach(tab => {
+      const selected = tab === button;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    document.getElementById('group-panel').setAttribute('aria-labelledby', button.id);
+    document.querySelector('[data-group-clock]').textContent = group.clock;
+    document.querySelector('[data-group-period]').textContent = `${group.period} root ticks / window`;
+    document.querySelectorAll('[data-window-labels] span').forEach((cell, i) => { cell.textContent = `${i * group.period}–${(i + 1) * group.period}`; });
+    const rows = document.querySelector('[data-group-tracks]');
+    rows.replaceChildren();
+    group.tracks.forEach(track => {
+      const row = document.createElement('div'); row.className = 'window-track';
+      const label = document.createElement('div');
+      const name = document.createElement('strong'); name.textContent = track.id;
+      const detail = document.createElement('small'); detail.textContent = `${track.role} · ${track.direction}`;
+      label.append(name, detail);
+      const cells = document.createElement('div'); cells.className = 'window-cells';
+      for (let i = 0; i < 4; i++) {
+        const cell = document.createElement('span'); cell.className = 'window-cell'; cell.textContent = track.format;
+        cells.append(cell);
+      }
+      row.append(label, cells); rows.append(row);
+    });
+    document.querySelector('[data-group-units]').textContent = group.units;
+    document.querySelector('[data-group-queue]').textContent = group.queue;
+    document.querySelector('[data-group-title]').textContent = group.id;
+    document.querySelector('[data-group-description]').textContent = group.description;
   }
-  function tick(now) {
-    if (!playing || document.hidden) { previous = 0; return; }
-    if (previous) elapsed = (elapsed + Math.min(now - previous, 100)) % 3000;
-    previous = now;
-    grid.style.setProperty('--progress', (elapsed / 3000).toFixed(4));
-    clock.textContent = '00:0' + (elapsed / 1000).toFixed(2);
-    frame = requestAnimationFrame(tick);
-  }
-  function start() { cancelAnimationFrame(frame); previous = 0; if (playing && !document.hidden) frame = requestAnimationFrame(tick); }
-  playButton.addEventListener('click', () => { playing = !playing; updateButton(); start(); });
-  document.addEventListener('visibilitychange', start);
-  motion.addEventListener('change', () => { if (motion.matches) { playing = false; updateButton(); start(); } });
-  updateButton(); start();
+  groupTabs.forEach((button, index) => {
+    button.addEventListener('click', () => showGroup(button));
+    button.addEventListener('keydown', event => {
+      let next;
+      if (event.key === 'ArrowRight') next = (index + 1) % groupTabs.length;
+      if (event.key === 'ArrowLeft') next = (index + groupTabs.length - 1) % groupTabs.length;
+      if (event.key === 'Home') next = 0;
+      if (event.key === 'End') next = groupTabs.length - 1;
+      if (next !== undefined) { event.preventDefault(); groupTabs[next].focus(); showGroup(groupTabs[next]); }
+    });
+  });
 
   const code = document.querySelector('[data-code]');
   const tabs = [...document.querySelectorAll('[data-example]')];
-  let selectedExample = 'output';
+  let selectedExample = 'clocks';
   function showExample(button) {
     selectedExample = button.dataset.example;
     tabs.forEach(tab => { const selected = tab === button; tab.setAttribute('aria-selected', String(selected)); tab.tabIndex = selected ? 0 : -1; });

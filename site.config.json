@@ -2,7 +2,8 @@
   "origin": "https://www.a2rt.org",
   "base_path": "/",
   "repository": "https://github.com/a2rt-project/a2rt",
-  "version": "0.2",
+  "version": "architecture-draft",
   "ai_endpoint": "https://api.a2rt.org/api/ai-qa/chat",
-  "turnstile_site_key": "0x4AAAAAAGBPqTietbCAsptD"
+  "turnstile_site_key": "0x4AAAAAAGBPqTietbCAsptD",
+  "revision": "2026-11-16"
 }

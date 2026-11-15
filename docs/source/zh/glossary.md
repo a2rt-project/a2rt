@@ -1,31 +1,67 @@
 # 术语表
 
-| 术语 | 含义 |
-| --- | --- |
-| Track | 逻辑信息分类，协议定义六种 |
-| Stream | 某条轨道中的具名流，绑定来源、内容格式和时钟 |
-| Event | 统一事件结构；方向决定它是执行请求还是观察事实 |
-| Operation | 需要边界、并发计数和清理的操作，可跨多个事件 |
-| Receipt | 执行器产生的 `core.result`，按 event_id 关联 |
-| Profile | 声明领域事件、工具、状态和执行策略的环境扩展 |
-| Manifest | 会话采用的能力清单，在 epoch 内冻结 |
-| Epoch | 会话配置与身份绑定的一代，重建后隔离旧命令 |
-| Actor | 参与者身份；与来源设备、发送方向分别表达 |
-| Source | 已注册的数据或事件来源，一个 actor 可有多个 source |
-| Context | 注册的环境上下文，关联 Profile 和策略 |
-| Binding | 可靠传输、鉴权、资源寻址及流控的具体约定 |
-| `observed_feedback_seq` | 生成 output 时实际使用的最高反馈序号，不是决策许可证 |
-| `reply_to` | 反馈与 output 的关联，可多次引用同一请求 |
+当前架构设计草案 · 2026-11-16。
 
-## 四种更新模式
+## 标准根时钟 / root
 
-- `new`：提供新的可消费数据。
-- `reuse`：引用历史视觉或状态，保留原始时间；不能重放音频或事件。
-- `empty`：没有新增、未就绪或不可用；不清空缓存。
-- `gap`：明确的缺失范围；不等于静音。
+每个 epoch 唯一的时间和容量基准，ID 固定为 root。
 
-## 容易混淆的状态
+## 子时钟 / Child clock
 
-`accepted` 不表示成功；`applied` 不一定表示操作完成；`unknown` 表示实际结果尚不能确认；`cancelled` 必须以真实终止和清理为依据。
+通过父周期比例与偏移派生节拍，继承标准单位，不增加容量。
 
-详见[轨道与时间](spec/02-tracks-and-time.md)和[执行与恢复](spec/04-execution-and-recovery.md)。
+## 信息同步组 / Synchronization group
+
+绑定一个时钟，以共同窗口组织轨道，并配置交付策略和资源限额。
+
+## 轨道 / Track
+
+配置角色、方向、来源和格式，通过 sync_group_id 引用一个同步组。
+
+## 标准帧单位 / Standard frame unit
+
+容量计量单位，计入 A2RT 封装开销；不同于逻辑数据帧。
+
+## 轨道数据帧 / Track data frame
+
+一条轨道在一个组周期内至多提交的一份逻辑数据。
+
+## 组信息帧 / Group information frame
+
+同组同周期的不同轨道数据帧集合；每项分别引用 track_id。
+
+## frame_seq
+
+从零计数，标识固定窗口。迟到和重传不改变原窗口身份。
+
+## role / direction / source_binding
+
+分别表达内容角色、相对智能体端的流向及获准发布者，不能互相替代。
+
+## delivery_policy
+
+Profile 定义的交付策略配置；具体等待起点、完整性和超时动作由 Profile 解释。
+
+## limits
+
+确认后的组编码容量及每个接收端的队列上限，由 Core／Binding 落实。
+
+## media_type / constraints / format_id
+
+类型选择约束规则，constraints 声明具体契约，format_id 引用会话格式目录。
+
+## epoch
+
+冻结配置的作用域。重新协商后的新配置进入新 epoch，历史数据保留原解释。
+
+## system
+
+必选且唯一、固定 input 的系统通知轨道角色，发布方为可信环境或协调器。
+
+## delivered_through
+
+某接收端已连续交付的位置，不等于最新到达位置或实际消费完成。
+
+## Profile
+
+定义领域内容契约、输出和任务边界，以及播放、恢复、完整性和内容校验。
