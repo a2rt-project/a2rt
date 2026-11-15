@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { handle, embedding, validatePayload } from '../src/index.js';
+import { handle, embedding, rank, validatePayload } from '../src/index.js';
 
 const origin = 'https://www.a2rt.org';
-const payload = { question: 'What is event_id?', language: 'en', currentPath: '/docs/en/', turnstileToken: 'test-token' };
-const chunk = { title: 'Events', section: 'Receipts', content: 'event_id associates execution receipts with an event.', docs_url: '/en/overview.html', embedding: await embedding('event_id execution receipts') };
+const payload = { question: 'What is sync_group_id?', language: 'en', currentPath: '/docs/en/', turnstileToken: 'test-token' };
+const chunk = { title: 'Synchronization groups', section: 'Identity', content: 'sync_group_id identifies an independent synchronization group.', docs_url: '/en/overview.html', embedding: await embedding('sync_group_id independent synchronization group') };
 function environment(overrides = {}) {
   return {
     AI_QA_ENABLED: 'true', AI_QA_API_KEY: 'fixture-only-model-secret', TURNSTILE_SECRET_KEY: 'fixture-only-challenge-secret',
@@ -22,7 +22,7 @@ function upstream(calls, verification = {}, modelStatus = 200) {
   return async (url, options) => {
     calls.push({ url: String(url), options });
     if (String(url).includes('siteverify')) return Response.json({ success: true, hostname: 'www.a2rt.org', action: 'docs_qa', ...verification });
-    return modelStatus === 200 ? Response.json({ choices: [{ message: { content: 'A receipt references event_id. [1]' } }] }) : new Response('sensitive provider error', { status: modelStatus });
+    return modelStatus === 200 ? Response.json({ choices: [{ message: { content: 'sync_group_id identifies a synchronization group. [1]' } }] }) : new Response('sensitive provider error', { status: modelStatus });
   };
 }
 
@@ -118,9 +118,11 @@ test('question is grounded in built docs; model credential stays upstream', asyn
   assert.equal(model.options.headers.Authorization, 'Bearer fixture-only-model-secret');
   assert.equal(model.options.redirect, 'manual');
   const sent = JSON.parse(model.options.body);
+  assert.match(sent.messages[0].content, /2026-11-16 architecture design draft/);
+  assert.match(sent.messages[0].content, /not a released wire format/);
   assert.equal(sent.stream, false);
   assert.equal(sent.max_tokens, 1024);
-  assert.match(sent.messages[1].content, /execution receipts/);
+  assert.match(sent.messages[1].content, /independent synchronization group/);
   assert.doesNotMatch(JSON.stringify(body), /fixture-only|test-token/);
 });
 test('provider errors are sanitized and carry no key or provider response body', async () => {
@@ -150,5 +152,27 @@ test('Worker hashing matches the actual Python-generated index', async () => {
   for (const chunk of chunks.slice(0, 3)) {
     const vector = await embedding(`${chunk.title}\n${chunk.section}\n${chunk.content}`);
     vector.forEach((value, index) => assert.ok(Math.abs(value - chunk.embedding[index]) < 0.000001));
+  }
+});
+
+
+test('health identifies the current architecture without claiming a wire release', async () => {
+  const response = await handle(new Request('https://api.a2rt.org/api/ai-qa/healthz'), environment());
+  const body = await response.json();
+  assert.equal(body.protocol, 'A2RT');
+  assert.equal(body.documentation, 'architecture-draft');
+  assert.equal(body.revision, '2026-11-16');
+});
+
+test('bilingual retrieval finds current single-frame and system-group rules', async () => {
+  for (const [language, question, expectedSource, evidence] of [
+    ['zh', 'system 轨道必须独立成组吗？', '04-system-track-and-lifecycle', /同组|同一.*组|独立.*组/],
+    ['zh', '每轨每周期最多一个数据帧是什么意思？', '01-clock-sync-group-track-model', /每条轨道每个周期最多只能有一个数据帧/],
+    ['en', 'Can both directions publish a data frame in the same period on a bidirectional track?', '01-clock-sync-group-track-model', /only one data frame|at most one data frame/],
+    ['en', 'What are Core and Profile responsibilities?', '03-core-profile-responsibilities', /Profile Content events and schemas/],
+  ]) {
+    const chunks = JSON.parse(await readFile(new URL(`../assets/index/chunks_${language}.json`, import.meta.url)));
+    const results = (await rank(question, chunks)).slice(0, 3);
+    assert.ok(results.some(result => result.source_path.includes(expectedSource) && evidence.test(result.content)), question);
   }
 });

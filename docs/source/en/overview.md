@@ -1,34 +1,38 @@
 # Protocol overview
 
-An agent may speak while acting. People may intervene, tools may still be running, and audio and visuals may arrive at different times. A2RT gives these processes common message semantics.
+The architecture uses shared time and capacity to organize information that belongs together, while allowing independent synchronization groups to progress separately. Deployments may use networks, local communication, or embodied systems. Configuration must match actual production, processing, transport, and consumption capacity.
 
-## Six logical tracks
+## From time to content
 
-| Track | Content |
-| --- | --- |
-| `assistant.audio` | Agent audio, explicit silence, and gaps |
-| `assistant.events` | Action requests, tool calls, and no-op decisions |
-| `environment.audio` | People, other participants, and device audio |
-| `environment.events` | Events that have already happened |
-| `environment.visual` | Screenshots, frames, or negotiated visual representations |
-| `environment.state` | Execution receipts, domain state, control results, playback progress |
+| Layer | Responsibility | Relationship |
+| --- | --- | --- |
+| Standard root clock | Common origin, frequency, standard-frame bytes, units per tick | Exactly one `clock_id=root` per epoch |
+| Child clock | Update rhythm through a parent period ratio and offset | One parent; ultimately reaches root |
+| Synchronization group | Common windows, delivery policy, group budget, receiver queues | Binds one clock |
+| Track | Role, direction, source, format, content policy | Binds one group through `sync_group_id` |
 
-Tracks are categories, not six connections. A track may contain multiple named streams. The baseline loop registers `assistant.events` and separate `environment.state` streams for `core.result` and `core.control_result`. Other capabilities are optional.
+Clocks and groups do not define role or direction. Track names do not replace explicit configuration. Separate groups can share a clock without waiting for one another.
 
-## Deliver when ready
+## Three different frame concepts
 
-Feedback may contain only audio, a receipt, or a new frame. A delayed visual keeps its source timestamp and state references. It must not replace a newer confirmed state or masquerade as a current capture.
+- A **standard frame unit** measures byte capacity, including A2RT envelope and fragmentation overhead.
+- A **track data frame** is one logical submission from a track in a period of its group.
+- A **group information frame** collects data frames from distinct tracks for one group window. It can occupy multiple standard units.
 
-Synchronization is local: an event explicitly aligned with an audio sample waits for that dependency, without imposing a session-wide barrier.
+Each track may contribute at most one data frame per period. Multiple sources and both directions share that slot. Fragmentation and retransmission do not create new slots; different content cannot overwrite an occupied position. A data frame is not a network packet, an audio sample, or one model generation.
 
-## Requests and facts
+## What synchronization covers
 
-`output.event` requests execution. `core.result` reports actual progress. `accepted` and `running` are not completion. The model cannot certify its own success.
+A Profile determines required members for each receiver, completeness, valid empty/held content, and timeout behavior. Core advances delivery using those results. When input and output share a group, each receiver waits only for its applicable members, not opposite-direction data or its own output.
 
-Environment events use the same Event structure but describe observed facts. They must never be executed again.
+A group does not require every member to be present unconditionally. Separate groups advance independently. Execution feedback may arrive in later windows and retains causal references. A Profile maps content time to presentation time; window coordinates alone are not device playback times.
 
-## Scope
+## System notifications and domain contracts
 
-Core defines identity, lifecycle, time, and receipts. Profiles define domain capabilities. Adapters execute them; bindings provide transport and authentication. MCP is one optional tool integration, not a synonym for A2RT.
+Every configuration must contain exactly one `role=system`, `direction=input` track from a trusted environment or coordinator. A Profile chooses its group and defines its notification names, fields, and schemas. Model content and optional session-ending requests use assistant output tracks.
 
-Draft 0.2 specifies no fixed frame rate, sampling rate, or hard real-time deadline. Implementations must separately validate performance and recovery.
+Core does not impose universal tool events, no-op events, or generation identifiers. Profiles define those contracts, as well as presentation, recovery, synchronization completeness, and content validation. Configuration is frozen within an epoch; negotiated changes preserve the interpretation of historical data.
+
+## Canvas is an instance
+
+Canvas selects six domain tracks plus the unique system input track, synchronized delivery, one active task per actor, and asynchronous recording. Other Profiles may choose different tracks and domain rules. See [Canvas adaptation](profiles/canvas.md).

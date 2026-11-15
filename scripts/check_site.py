@@ -60,10 +60,29 @@ for path in DIST.rglob("*"):
         if "<built-in method" in body:
             errors.append(f"Template interpolation error in {path.relative_to(DIST)}")
 
+source_info = json.loads((ROOT / "protocol/SOURCE.json").read_text())
+index_root = DIST / "docs/ai-index"
+version = json.loads((index_root / "version.json").read_text())
+for field in ("status", "revision", "wire_protocol_version", "source_commit"):
+    if version.get(field) != source_info[field]:
+        errors.append(f"Search index provenance mismatch: {field}")
+for artifact in index_root.glob("*.json"):
+    if artifact.read_bytes() != (ROOT / "worker/assets/index" / artifact.name).read_bytes():
+        errors.append(f"Public and Worker indexes differ: {artifact.name}")
+
+expected_specs = {f"spec/{path.stem}.html" for path in (ROOT / "protocol").glob("0[1-4]-*.md")}
 for name in ("zh", "en"):
     chunks = json.loads((DIST / f"docs/ai-index/chunks_{name}.json").read_text())
     if not chunks or any(len(item.get("embedding", [])) != 384 for item in chunks):
         errors.append(f"Invalid {name} search index")
+    indexed = {item["source_path"] for item in chunks}
+    if {path for path in indexed if path.startswith("spec/")} != expected_specs or "profiles/canvas.html" not in indexed:
+        errors.append(f"{name} index does not match the current architecture chapters")
+    for chunk in chunks:
+        citation = urlsplit(chunk["docs_url"])
+        target = DIST / "docs" / unquote(citation.path.lstrip("/"))
+        if target not in pages or (citation.fragment and unquote(citation.fragment) not in pages[target].ids):
+            errors.append(f"Invalid {name} search citation: {chunk['docs_url']}")
 if errors:
     raise SystemExit("\n".join(errors))
 print(f"Passed: {len(pages)} HTML pages, {references} local references, bilingual indexes, and public artifact credential scan.")

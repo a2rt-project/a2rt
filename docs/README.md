@@ -21,3 +21,13 @@ the Worker-backed AI interface.
 
 The build also creates a JSON index from the rendered documentation. The Worker
 reads that exact index; it does not require a separate ChromaDB process.
+
+Current content is the 2026-11-16 architecture design draft. The Chinese Canvas
+page is also generated from `protocol/profiles/canvas/README.md`. This repository
+publishes only the current architecture. There is no released matching wire
+schema or runtime; configuration illustrations must be labelled as such.
+
+Use `python scripts/build.py --preview` for a local review. It enables local
+search against the newly built index without calling the production AI service.
+The public index and Worker asset index include the same `version.json`, with
+an architecture revision and a null wire-protocol version.

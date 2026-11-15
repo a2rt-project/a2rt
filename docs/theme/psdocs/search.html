@@ -13,7 +13,7 @@
   <h1 id="search-documentation">{{ ps_ui.search_docs }}</h1>
   <p>{{ '在 A2RT 规范与指南中查找关键词。' if ps_current_language.code == 'zh' else 'Find keywords in the A2RT specification and guides.' }}</p>
   <form class="a2rt-search-form" action="" method="get" role="search">
-    <input type="search" name="q" aria-labelledby="search-documentation" placeholder="{{ '例如：回执、轨道、event_id' if ps_current_language.code == 'zh' else 'Try: receipts, tracks, event_id' }}" required>
+    <input type="search" name="q" aria-labelledby="search-documentation" placeholder="{{ '例如：根时钟、同步组、system' if ps_current_language.code == 'zh' else 'Try: root clock, sync group, system' }}" required>
     <button type="submit">{{ ps_ui.search_docs }} →</button>
   </form>
   <p data-search-status role="status"></p>

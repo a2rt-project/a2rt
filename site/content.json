@@ -1,89 +1,436 @@
 {
   "zh": {
     "title": "A2RT — 智能体实时多模态交互协议",
-    "description": "A2RT 连接智能体与实时环境。六条独立逻辑轨道，明确的执行回执，可扩展的环境 Profile。探索 0.2 草案、JSON Schema 与完整消息示例。",
-    "skip": "跳到主要内容", "home": "首页", "menu": "展开导航", "navigation": "网站导航", "nav_protocol": "协议", "nav_architecture": "架构", "release": "v0.2 · 草案已发布",
-    "hero_first": "让智能体，", "hero_second": "与世界同步。",
-    "hero_description": "声音、画面、事件，各有自己的节奏。A2RT 用一套通用协议，让智能体持续感知环境、发出操作，并获得真实的执行反馈。",
-    "start": "开始阅读", "explore": "探索六条轨道", "hero_note": "厂商无关 · 环境可扩展 · 异步多模态",
-    "console_label": "六条逻辑轨道的交互示意", "illustration": "交互示意", "select_track": "选择轨道查看说明", "tracks_label": "LOGICAL TRACKS", "pause": "暂停", "play": "播放", "independent": "独立更新 / 因果关联", "track_details": "了解轨道语义", "console_caption": "点击轨道查看说明 · 时间仅作示意，不代表性能测量或固定频率",
-    "tracks": [
-      {"id":"assistant.audio","symbol":"∿","color":"green","type":"wave","description":"智能体的声音独立流式交付；无需等待下一次操作，也不强制每条事件附带音频。"},
-      {"id":"assistant.events","symbol":"⌁","color":"green","type":"events","description":"每个 output 恰好包含一个事件。Profile 决定发送窗口，连续操作可以有多个事件在途。"},
-      {"id":"environment.audio","symbol":"∿","color":"blue","type":"wave","description":"人的声音、其他参与者与设备音频独立到达，保留来源时钟和实际采样范围。"},
-      {"id":"environment.events","symbol":"⌁","color":"blue","type":"events","description":"记录人或环境中已发生的事件。它们是观察到的事实，不应再次发送给执行器执行。"},
-      {"id":"environment.visual","symbol":"▧","color":"purple","type":"visual","description":"画面保留采集时刻和关联状态版本。视觉晚到时，已就绪的声音与回执仍可先交付。"},
-      {"id":"environment.state","symbol":"≡","color":"teal","type":"state","description":"承载真实执行回执、领域状态与播放进度。accepted 不等于成功，完成状态由执行器确认。"}
+    "description": "A2RT 用标准根时钟、信息同步组与自定义轨道组织智能体和实时环境之间的多模态信息。了解当前架构草案、容量约束与 Profile 职责。",
+    "skip": "跳到主要内容",
+    "home": "首页",
+    "menu": "展开导航",
+    "navigation": "网站导航",
+    "nav_protocol": "协议",
+    "nav_architecture": "架构",
+    "release": "2026.11 · 架构设计草案",
+    "hero_first": "不同节奏，",
+    "hero_second": "共同的时间。",
+    "hero_description": "声音、画面与操作，共享时间刻度，各有更新节拍。A2RT 用时钟、信息同步组和自定义轨道，组织智能体与实时环境之间的信息交互。",
+    "start": "开始阅读",
+    "explore": "探索同步组",
+    "hero_note": "统一时间 · 按组同步 · Profile 定义语义",
+    "console_label": "根时钟与独立信息同步组的配置示意",
+    "illustration": "配置示意",
+    "console_caption": "取自规范配置示例 · 数值用于说明关系，不代表性能或时延保证",
+    "strip_one": "一个根时钟",
+    "strip_two": "独立同步组 · 自定义轨道",
+    "strip_three": "共同预算，明确边界",
+    "protocol_title": "让实时信息，有序相遇。",
+    "protocol_intro": "从统一刻度到共同窗口，再到具体内容。A2RT 把时间、容量和同步关系说清楚，让不同环境按自己的规则协作。",
+    "principles": [
+      {
+        "title": "同一刻度，不同节拍",
+        "body": "根时钟提供时间与容量基准，子时钟组织更新节拍。所有窗口边界精确落在整数根刻度，子时钟不创造额外容量。"
+      },
+      {
+        "title": "按组组织，独立交付",
+        "body": "同组内容使用共同窗口，各接收端按 Profile 判断完整性。多个组可以共享时钟，仍然独立推进。"
+      },
+      {
+        "title": "通用机制，领域契约",
+        "body": "Core 固定身份、引用、帧数和预算约束。Profile 定义播放、恢复、完整性与内容校验，适配器报告真实结果。"
+      }
     ],
-    "strip_one":"06 条逻辑轨道", "strip_two":"CORE + ENVIRONMENT PROFILES", "strip_three":"就绪即交付，不等待全部模态",
-    "protocol_title":"世界持续发生，交互也应如此。", "protocol_intro":"实时环境不会等待一次对话结束。A2RT 将感知、操作和反馈分开推进，同时保留它们之间的时间、来源与因果关系。",
-    "principles":[
-      {"title":"各自流动，局部同步","body":"音频先到就先交付，画面晚到就保留真实时间。只有声明了依赖的声音和操作需要相互等待。"},
-      {"title":"请求之后，必须有事实","body":"事件描述想要做什么，回执说明实际发生了什么。通过 event_id 关联进展、失败和真实终态。"},
-      {"title":"通用核心，具体环境","body":"Core 固定生命周期与交互语义。Profile 声明领域能力，Adapter 将能力映射到真实应用或设备。"}
+    "architecture_title": "清楚的边界，\n可扩展的环境。",
+    "architecture_intro": "时间组织与承载规则在 Core 中保持一致。具体事件、媒体处理和任务语义由 Profile 声明，运行时与传输绑定落实。",
+    "architecture_link": "阅读 Core 与 Profile 职责",
+    "architecture_note": "当前为架构设计草案。对应的新线协议版本、完整机器定义和运行时尚未发布。",
+    "layers": [
+      {
+        "name": "A2RT Core",
+        "subtitle": "承载、时间与通用约束",
+        "body": "管理时钟树、同步组、轨道引用与交付状态，约束每轨每周期单帧、共享容量和各接收端队列。",
+        "tags": [
+          "Clocks",
+          "Sync groups",
+          "Budgets"
+        ]
+      },
+      {
+        "name": "Profile",
+        "subtitle": "定义内容与交互规则",
+        "body": "声明 system 与 assistant 内容契约、输出和任务边界，并定义播放、恢复、同步完整性及内容校验。",
+        "tags": [
+          "Presentation",
+          "Recovery",
+          "Validation"
+        ]
+      },
+      {
+        "name": "Adapter / Application",
+        "subtitle": "处理内容，执行真实操作",
+        "body": "按 Profile 解码、校验、判断就绪、呈现和执行；区分收到、交付、消费与完成，保留真实来源时间。",
+        "tags": [
+          "Decode",
+          "Execute",
+          "Report"
+        ]
+      },
+      {
+        "name": "Binding",
+        "subtitle": "落实节拍与资源预算",
+        "body": "处理连接、来源绑定、分片与重组，落实发送调度、容量和队列上限；传输成功不代表业务完成。",
+        "tags": [
+          "Transport",
+          "Reassembly",
+          "Backpressure"
+        ]
+      }
     ],
-    "architecture_title":"一套核心，\n连接不同环境。", "architecture_intro":"把稳定的交互规则留在核心，把领域差异交给明确的扩展层。为网页、协作画布、桌面与仿真环境定义各自的能力。", "architecture_link":"阅读核心与 Profile 规范", "architecture_note":"这些是协议可适配的环境方向；当前草案不包含已上线的领域适配器。",
-    "layers":[
-      {"name":"A2RT Core","subtitle":"定义交互的共同语言","body":"统一消息、逻辑轨道、身份引用、来源时间、操作边界，以及执行回执和恢复语义。","tags":["Event","TrackUpdate","Receipt"]},
-      {"name":"Environment Profile","subtitle":"声明一个环境能做什么","body":"注册自定义事件、状态 Schema、工具和具名执行策略。能力清单在 epoch 内冻结，并保留内容哈希。","tags":["Schemas","Capabilities","Policy"]},
-      {"name":"Adapter","subtitle":"把请求变为真实执行","body":"连接真实应用或设备，检查当前状态和权限，产生可信观察与执行回执。模型不能自证操作成功。","tags":["Execution","Observation","Cleanup"]},
-      {"name":"Binding","subtitle":"负责可靠、安全的交付","body":"处理连接、鉴权、资源寻址和流控。具体传输绑定需要独立定义；使用 WebSocket 不自动代表兼容 A2RT。","tags":["Transport","Auth","Media"]}
+    "example_title": "从一份配置开始。",
+    "example_intro": "查看规范中的时钟、同步组与轨道配置片段。它们解释架构关系，不是已发布的新线协议消息格式。",
+    "example_tabs": "架构配置片段",
+    "copy": "复制",
+    "copied": "已复制",
+    "copy_failed": "请手动选择复制",
+    "fixture": "架构草案 · 配置示意",
+    "download": "完整配置示例",
+    "example_kicker": "EXPLICIT BY DESIGN",
+    "example_notes": [
+      {
+        "title": "时间与容量一起约定",
+        "body": "root 的频率、标准帧字节数和每刻容量共同构成调度基准，须匹配实际生产、传输与消费能力。"
+      },
+      {
+        "title": "每条轨道，一个位置",
+        "body": "(epoch, sync_group_id, frame_seq, track_id) 定位数据帧。分片、重传、多来源或双向发布都不增加名额。"
+      },
+      {
+        "title": "配置冻结，历史可解释",
+        "body": "时钟、分组、策略、限额和格式在 epoch 内冻结。变更需重新协商，旧数据保留原来的时间与配置解释。"
+      }
     ],
-    "example_title":"协议，可以直接读。", "example_intro":"从一个非画布计数器环境入手，查看真实 fixture 中的输出、反馈与会话清单。示例可用仓库内校验器复核。", "example_tabs":"消息示例类型", "copy":"复制", "copied":"已复制", "copy_failed":"请手动选择复制", "fixture":"来自 v0.2 校验示例", "download":"完整记录", "example_kicker":"EXPLICIT BY DESIGN",
-    "example_notes":[
-      {"title":"明确的来源与版本","body":"session_id、epoch 和 manifest_id 标识本次会话上下文；sent_at 保留来源时钟。"},
-      {"title":"事件窗口与操作名额分开","body":"同一次操作可以连续发送多个事件。收到首个真实回执释放事件窗口，真实终态才释放操作名额。"},
-      {"title":"异步交付，持续关联","body":"同一请求可以先收到 accepted，再收到 completed。每次进展都通过 event_id 与 revision 对账。"}
+    "all_examples": "查看配置与设计检查",
+    "faq_title": "实现之前，\n先对齐这些约定。",
+    "faq": [
+      {
+        "question": "当前架构已经有可用 SDK 或新线协议了吗？",
+        "answer": "尚未发布与当前架构匹配的新线协议版本、完整机器定义或运行时。文档中的 JSON 用于说明设计；当前实现状态以新版架构文档为准。"
+      },
+      {
+        "question": "A2RT 固定只有六条轨道吗？",
+        "answer": "轨道可以按需注册。Canvas 的配置包含六条领域轨道，另外必须配置唯一的 system 输入轨道。角色与方向只定义在轨道上。"
+      },
+      {
+        "question": "同步组会让所有内容互相等待吗？",
+        "answer": "Profile 定义各接收端需要哪些内容、何时完整及如何处理超时。输入和输出同组不形成循环等待；多个组即使共享时钟也独立交付。"
+      },
+      {
+        "question": "system 通知是否必须独立成组？",
+        "answer": "不必须。Profile 可以让唯一 system 输入轨道与媒体同组，也可以独立配置。需要及时通知时推荐独立组；实际中断和清理不等待通知配齐。"
+      },
+      {
+        "question": "根时钟频率就是性能保证吗？",
+        "answer": "频率与容量表达调度约定。实际时延还取决于配置、突发负载和运行时是否落实预算；仅通过时间换算与预算算式不能证明运行时性能。"
+      }
     ],
-    "all_examples":"查看示例与校验方法", "faq_title":"开始之前，\n你可能想知道。",
-    "faq":[
-      {"question":"A2RT 现在可以直接用于生产吗？","answer":"当前版本是 0.2 协议草案，交付包括规范、JSON Schema、消息示例和文档校验器。它不是生产 SDK，也尚未提供完整传输绑定或生产级执行器。"},
-      {"question":"必须同时启用六条轨道吗？","answer":"不需要。六条轨道是逻辑分类，按能力启用，并非六条连接。基础闭环需要 assistant.events，以及 environment.state 中分别承载 core.result 和 core.control_result 的 stream。"},
-      {"question":"A2RT 和 MCP 是什么关系？","answer":"MCP 可以作为工具接入方式之一，由适配器处理其握手、鉴权与调用。A2RT 负责实时环境的事件、媒体、观察和执行反馈；二者的映射需要明确设计，不能仅包一层 JSON 就宣称兼容。"},
-      {"question":"协议保证固定帧率或毫秒级截止时间吗？","answer":"不保证。A2RT 不固定帧率、采样率或全局时间窗口，也没有硬实时截止保证。实际时延、吞吐、媒体同步误差和恢复行为需要具体实现的工程验收。"}
-    ],
-    "closing_title":"让下一次交互，有据可循。", "closing_body":"从协议草案开始，一起定义智能体与实时环境之间的连接。", "read_docs":"阅读文档", "contribute":"参与讨论", "footer_navigation":"页脚导航", "footer_note":"0.2 草案 · 规范、Schema 与可复核示例", "back_top":"回到顶部"
+    "closing_title": "为下一种实时环境，定义连接。",
+    "closing_body": "从时间、同步与内容契约出发，参与 A2RT 架构的讨论与实现。",
+    "read_docs": "阅读文档",
+    "contribute": "参与讨论",
+    "footer_navigation": "页脚导航",
+    "footer_note": "架构设计草案 · 2026-11-16",
+    "back_top": "回到顶部",
+    "select_group": "选择信息同步组",
+    "root_capacity": "1,024 B / 标准单位 · 1 单位 / 根刻度",
+    "window_label": "窗口 / root ticks",
+    "group_budget": "组容量 / 窗口",
+    "queue_label": "接收队列上限",
+    "unit_label": "单位",
+    "frame_label": "帧 / 接收端",
+    "one_frame": "每轨每周期 ≤ 1 个数据帧",
+    "group_details": "了解同步组与轨道",
+    "footer_reference": "架构规范 ↗",
+    "groups": [
+      {
+        "id": "interaction",
+        "clock": "interaction_clock",
+        "period": 100,
+        "units": 64,
+        "queue": 4,
+        "tracks": [
+          {
+            "id": "speech",
+            "role": "assistant",
+            "direction": "output",
+            "format": "PCM"
+          },
+          {
+            "id": "assistant_events",
+            "role": "assistant",
+            "direction": "output",
+            "format": "JSON"
+          },
+          {
+            "id": "microphone",
+            "role": "user",
+            "direction": "input",
+            "format": "PCM"
+          },
+          {
+            "id": "shared_state",
+            "role": "environment",
+            "direction": "bidirectional",
+            "format": "JSON"
+          }
+        ],
+        "description": "100 ms 窗口组织四条示例轨道。模型端与环境端分别判断自己的交付条件；双向状态轨道每周期也只有一个发布名额。"
+      },
+      {
+        "id": "tactile",
+        "clock": "sensor_clock",
+        "period": 10,
+        "units": 2,
+        "queue": 3,
+        "tracks": [
+          {
+            "id": "touch",
+            "role": "environment",
+            "direction": "input",
+            "format": "JSON"
+          }
+        ],
+        "description": "触觉组以 10 ms 窗口独立推进。它与其他组共享根容量，Profile 判断内容完整性并定义部分交付等规则。"
+      },
+      {
+        "id": "system_control",
+        "clock": "system_clock",
+        "period": 10,
+        "units": 1,
+        "queue": 3,
+        "tracks": [
+          {
+            "id": "system",
+            "role": "system",
+            "direction": "input",
+            "format": "JSON"
+          }
+        ],
+        "description": "示例将唯一的 system 输入轨道放在独立组。其他 Profile 可以选择同组；实际中断与清理不等待通知交付。"
+      }
+    ]
   },
   "en": {
-    "title":"A2RT — Agent-to-Real-Time Protocol", "description":"A protocol for agents interacting with real-time environments. Six independent logical tracks, explicit execution receipts, and extensible environment profiles. Explore the 0.2 draft.",
-    "skip":"Skip to content", "home":"Home", "menu":"Toggle navigation", "navigation":"Main navigation", "nav_protocol":"Protocol", "nav_architecture":"Architecture", "release":"v0.2 · Draft available",
-    "hero_first":"Intelligence.", "hero_second":"In real time.", "hero_description":"Audio, visuals, and events move at their own pace. A2RT gives agents a common protocol to observe, act, and receive truthful feedback from a changing world.", "start":"Read the docs", "explore":"Explore the tracks", "hero_note":"Vendor-neutral · Extensible · Asynchronous",
-    "console_label":"Interactive illustration of six logical tracks", "illustration":"ILLUSTRATION", "select_track":"Select a track to learn more", "tracks_label":"LOGICAL TRACKS", "pause":"Pause", "play":"Play", "independent":"Independent. Causally linked.", "track_details":"Explore track semantics", "console_caption":"Select a track to explore · Illustrative timing, not a performance benchmark",
-    "tracks":[
-      {"id":"assistant.audio","symbol":"∿","color":"green","type":"wave","description":"Agent audio streams independently. A chunk need not wait for an action, and an action need not carry audio."},
-      {"id":"assistant.events","symbol":"⌁","color":"green","type":"events","description":"Each output carries one event. A Profile defines the sending window; one operation may have multiple events in flight."},
-      {"id":"environment.audio","symbol":"∿","color":"blue","type":"wave","description":"People, participants, and devices contribute audio with explicit source clocks and sample ranges."},
-      {"id":"environment.events","symbol":"⌁","color":"blue","type":"events","description":"Events that have already happened in the environment. These observed facts must never be executed again."},
-      {"id":"environment.visual","symbol":"▧","color":"purple","type":"visual","description":"Visuals keep their capture time and source state references. Late visuals do not block ready audio or receipts."},
-      {"id":"environment.state","symbol":"≡","color":"teal","type":"state","description":"Real execution receipts, domain state, and playback progress. Acceptance is not success; the executor confirms completion."}
+    "title": "A2RT — Agent-to-Real-Time Protocol",
+    "description": "A2RT organizes multimodal interaction between agents and real-time environments through a shared root clock, synchronization groups, and configurable tracks.",
+    "skip": "Skip to content",
+    "home": "Home",
+    "menu": "Toggle navigation",
+    "navigation": "Main navigation",
+    "nav_protocol": "Protocol",
+    "nav_architecture": "Architecture",
+    "release": "2026.11 · Architecture draft",
+    "hero_first": "Different rhythms.",
+    "hero_second": "Shared time.",
+    "hero_description": "Audio, visuals, and actions share a time coordinate, with their own update rhythms. A2RT organizes interaction through clocks, synchronization groups, and configurable tracks.",
+    "start": "Read the docs",
+    "explore": "Explore sync groups",
+    "hero_note": "Shared time · Grouped delivery · Profile semantics",
+    "console_label": "Configuration illustration of a root clock and independent synchronization groups",
+    "illustration": "ILLUSTRATION",
+    "console_caption": "From the draft configuration · Illustrative values, not latency or performance guarantees",
+    "strip_one": "ONE ROOT CLOCK",
+    "strip_two": "INDEPENDENT GROUPS · CONFIGURABLE TRACKS",
+    "strip_three": "SHARED CAPACITY. EXPLICIT BOUNDARIES.",
+    "protocol_title": "Give real-time information a common ground.",
+    "protocol_intro": "A shared coordinate. Common windows. Explicit content contracts. A2RT makes time, capacity, and synchronization relationships clear across environments.",
+    "principles": [
+      {
+        "title": "Shared time, different rhythms",
+        "body": "A root clock defines time and capacity. Child clocks organize updates. Window boundaries map exactly to integer root ticks; child clocks add no capacity."
+      },
+      {
+        "title": "Grouped, independently delivered",
+        "body": "Tracks in a group share windows. Each receiver applies its Profile’s completeness rules. Groups may share a clock and still advance independently."
+      },
+      {
+        "title": "Common rules, domain contracts",
+        "body": "Core fixes identities, references, frame counts, and budgets. Profiles define presentation, recovery, completeness, and content validation."
+      }
     ],
-    "strip_one":"06 LOGICAL TRACKS", "strip_two":"CORE + ENVIRONMENT PROFILES", "strip_three":"DELIVER WHEN READY",
-    "protocol_title":"The world keeps moving. So should interaction.", "protocol_intro":"A real-time environment does not wait for a conversation turn to end. A2RT lets observation, action, and feedback progress independently, with time, provenance, and causality intact.",
-    "principles":[
-      {"title":"Independent by default","body":"Deliver audio as it arrives. Preserve the timestamp of a late frame. Synchronize only the media and events with declared dependencies."},
-      {"title":"Requests meet reality","body":"An event says what should happen. A receipt says what actually happened. Link progress, failures, and terminal outcomes through event_id."},
-      {"title":"One core. Many environments.","body":"Core defines the lifecycle and interaction semantics. Profiles declare domain capabilities. Adapters connect them to real applications and devices."}
+    "architecture_title": "Clear boundaries.\nRoom for your world.",
+    "architecture_intro": "Core keeps time and carriage rules consistent. Profiles specify events, media processing, and task semantics. Runtime and transport implementations make those contracts work.",
+    "architecture_link": "Read Core & Profile responsibilities",
+    "architecture_note": "This is an architecture design draft. A matching new wire version, complete machine definitions, and runtime have not been released.",
+    "layers": [
+      {
+        "name": "A2RT Core",
+        "subtitle": "Carriage, time, and invariants",
+        "body": "Clock trees, synchronization groups, track references, and delivery states. Enforce one data frame per track per period, shared budgets, and receiver queues.",
+        "tags": [
+          "Clocks",
+          "Sync groups",
+          "Budgets"
+        ]
+      },
+      {
+        "name": "Profile",
+        "subtitle": "Content and interaction contracts",
+        "body": "Define system and assistant content, output and task boundaries, presentation, recovery, synchronization completeness, and content validation.",
+        "tags": [
+          "Presentation",
+          "Recovery",
+          "Validation"
+        ]
+      },
+      {
+        "name": "Adapter / Application",
+        "subtitle": "Process content and act",
+        "body": "Decode, validate, present, and execute under the Profile. Distinguish receipt, delivery, consumption, and completion while preserving source time.",
+        "tags": [
+          "Decode",
+          "Execute",
+          "Report"
+        ]
+      },
+      {
+        "name": "Binding",
+        "subtitle": "Make timing and budgets operational",
+        "body": "Connections, trusted sources, fragmentation, and reassembly. Enforce scheduling, capacity, and queue limits; transport success is not business completion.",
+        "tags": [
+          "Transport",
+          "Reassembly",
+          "Backpressure"
+        ]
+      }
     ],
-    "architecture_title":"A shared foundation.\nRoom for your world.", "architecture_intro":"Keep stable interaction rules in the core, and domain differences in explicit extensions. Define capabilities for browsers, canvases, desktops, or simulations.", "architecture_link":"Read Core & Profiles", "architecture_note":"These are possible adaptation directions. The draft does not ship production adapters for these environments.",
-    "layers":[
-      {"name":"A2RT Core","subtitle":"A common language for interaction","body":"Messages, logical tracks, identity references, source clocks, operation boundaries, execution receipts, and recovery semantics.","tags":["Event","TrackUpdate","Receipt"]},
-      {"name":"Environment Profile","subtitle":"Declare what an environment can do","body":"Register domain events, state schemas, tools, and named execution policies. A manifest freezes capabilities and content hashes within an epoch.","tags":["Schemas","Capabilities","Policy"]},
-      {"name":"Adapter","subtitle":"Turn requests into real execution","body":"Connect to an application or device, check permissions and actual state, and report observations and execution receipts. An agent cannot certify its own success.","tags":["Execution","Observation","Cleanup"]},
-      {"name":"Binding","subtitle":"Deliver reliably and securely","body":"Connections, authentication, media addressing, and flow control. Each transport needs an explicit binding; a WebSocket alone is not A2RT compatibility.","tags":["Transport","Auth","Media"]}
+    "example_title": "Start with a configuration.",
+    "example_intro": "Explore clock, group, and track excerpts from the draft. They illustrate architecture relationships, not a released new wire message format.",
+    "example_tabs": "Architecture configuration excerpts",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copy_failed": "Select to copy",
+    "fixture": "Architecture draft · Illustration",
+    "download": "Full example",
+    "example_kicker": "EXPLICIT BY DESIGN",
+    "example_notes": [
+      {
+        "title": "Time and capacity together",
+        "body": "Root frequency, standard-frame bytes, and units per tick define a scheduling contract that must match production, transport, and consumption capacity."
+      },
+      {
+        "title": "One position per track",
+        "body": "(epoch, sync_group_id, frame_seq, track_id) identifies a data frame. Fragmentation, retries, multiple sources, or directions do not add slots."
+      },
+      {
+        "title": "Frozen configuration, stable history",
+        "body": "Clocks, groups, policies, limits, and formats are frozen within an epoch. Changes require negotiation; old data keeps its original interpretation."
+      }
     ],
-    "example_title":"A protocol you can read.", "example_intro":"Explore an output, feedback, and session manifest from the counter-environment fixture. Check the complete records with the repository validator.", "example_tabs":"Message example type", "copy":"Copy", "copied":"Copied", "copy_failed":"Select to copy", "fixture":"From the v0.2 fixtures", "download":"Full trace", "example_kicker":"EXPLICIT BY DESIGN",
-    "example_notes":[
-      {"title":"Identity and version, explicit","body":"session_id, epoch, and manifest_id identify the session context. sent_at preserves the source clock."},
-      {"title":"Two separate limits","body":"Multiple events may belong to one operation. A first real receipt frees an event slot; a confirmed terminal state frees the operation slot."},
-      {"title":"Asynchronous. Still connected.","body":"A request can receive accepted and later completed. Associate each update through event_id and a monotonically increasing revision."}
+    "all_examples": "Explore configurations & design checks",
+    "faq_title": "Before you implement.",
+    "faq": [
+      {
+        "question": "Is there an SDK or wire version for this architecture?",
+        "answer": "A matching new wire version, complete machine definitions, and runtime have not been released. JSON examples explain the design. The current architecture documents define the implementation scope."
+      },
+      {
+        "question": "Does A2RT have exactly six tracks?",
+        "answer": "Tracks are registered as needed. Canvas uses six domain tracks plus the mandatory, unique system input track. Role and direction are defined only on tracks."
+      },
+      {
+        "question": "Does synchronization make everything wait?",
+        "answer": "Each receiver’s Profile defines required content, completeness, and timeout behavior. Input and output in one group do not create circular waiting. Separate groups remain independent even when sharing a clock."
+      },
+      {
+        "question": "Must system notifications have their own group?",
+        "answer": "No. A Profile may place the unique system input track with media or in a separate group. A separate group is recommended for timely notifications; actual interruption and cleanup do not wait for delivery."
+      },
+      {
+        "question": "Does root frequency guarantee performance?",
+        "answer": "Frequency and capacity express a scheduling contract. Actual latency depends on configuration, bursts, and runtime enforcement. Valid clock arithmetic and budget totals alone do not validate runtime performance."
+      }
     ],
-    "all_examples":"Explore examples & validation", "faq_title":"Before you start building.",
-    "faq":[
-      {"question":"Is A2RT ready for production?","answer":"Version 0.2 is a protocol draft with a specification, JSON Schemas, fixtures, and a documentation validator. It is not a production SDK, transport binding, or complete runtime."},
-      {"question":"Do I need all six tracks?","answer":"No. Tracks are logical categories, enabled by capability, not six separate connections. The baseline loop requires assistant.events and separate environment.state streams for core.result and core.control_result."},
-      {"question":"How does A2RT relate to MCP?","answer":"MCP is an optional tool integration handled by an adapter. A2RT describes events, media, observations, and execution feedback in a real-time environment. A mapping needs explicit design; wrapping JSON does not establish compatibility."},
-      {"question":"Does the protocol guarantee fixed latency?","answer":"No. A2RT specifies neither a fixed frame rate nor a global timing window, and provides no hard real-time deadline guarantee. Latency, throughput, synchronization error, and recovery need implementation-level validation."}
-    ],
-    "closing_title":"Make the next interaction count.", "closing_body":"Start with the draft. Help shape the connection between agents and real-time environments.", "read_docs":"Read the docs", "contribute":"Join the discussion", "footer_navigation":"Footer navigation", "footer_note":"Draft 0.2 · Specification, schemas & verifiable examples", "back_top":"Back to top"
+    "closing_title": "Define the next real-time connection.",
+    "closing_body": "Start with time, synchronization, and content contracts. Help shape the A2RT architecture.",
+    "read_docs": "Read the docs",
+    "contribute": "Join the discussion",
+    "footer_navigation": "Footer navigation",
+    "footer_note": "Architecture design draft · 2026-11-16",
+    "back_top": "Back to top",
+    "select_group": "Select a synchronization group",
+    "root_capacity": "1,024 B / standard unit · 1 unit / root tick",
+    "window_label": "WINDOW / ROOT TICKS",
+    "group_budget": "Group budget / window",
+    "queue_label": "Receiver queue limit",
+    "unit_label": "units",
+    "frame_label": "frames / receiver",
+    "one_frame": "Each track / period: at most 1 data frame",
+    "group_details": "Explore groups & tracks",
+    "footer_reference": "Architecture specification ↗",
+    "groups": [
+      {
+        "id": "interaction",
+        "clock": "interaction_clock",
+        "period": 100,
+        "units": 64,
+        "queue": 4,
+        "tracks": [
+          {
+            "id": "speech",
+            "role": "assistant",
+            "direction": "output",
+            "format": "PCM"
+          },
+          {
+            "id": "assistant_events",
+            "role": "assistant",
+            "direction": "output",
+            "format": "JSON"
+          },
+          {
+            "id": "microphone",
+            "role": "user",
+            "direction": "input",
+            "format": "PCM"
+          },
+          {
+            "id": "shared_state",
+            "role": "environment",
+            "direction": "bidirectional",
+            "format": "JSON"
+          }
+        ],
+        "description": "A 100 ms window groups four example tracks. Each receiver checks its own delivery conditions. The bidirectional state track still has only one publishing slot per period."
+      },
+      {
+        "id": "tactile",
+        "clock": "sensor_clock",
+        "period": 10,
+        "units": 2,
+        "queue": 3,
+        "tracks": [
+          {
+            "id": "touch",
+            "role": "environment",
+            "direction": "input",
+            "format": "JSON"
+          }
+        ],
+        "description": "The tactile group advances independently in 10 ms windows. It shares root capacity with other groups; its Profile defines completeness and partial delivery."
+      },
+      {
+        "id": "system_control",
+        "clock": "system_clock",
+        "period": 10,
+        "units": 1,
+        "queue": 3,
+        "tracks": [
+          {
+            "id": "system",
+            "role": "system",
+            "direction": "input",
+            "format": "JSON"
+          }
+        ],
+        "description": "This example places the unique system input track in a separate group. Other Profiles may share a group; actual interruption and cleanup do not wait for notification delivery."
+      }
+    ]
   }
 }

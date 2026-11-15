@@ -1,47 +1,31 @@
-# 快速入门
+# 设计接入步骤
 
-本页帮助你阅读和校验协议，不会启动生产运行时。
+当前阶段从架构配置和 Profile 契约开始设计接入。尚无对应的新 SDK、线协议 Schema 或运行时，以下步骤不是可直接启动生产会话的安装教程。
 
-## 1. 获取协议仓库
+## 1. 明确参与方与实际能力
 
-```sh
-git clone https://github.com/a2rt-project/a2rt.git
-cd a2rt
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-```
+指定智能体端、环境端、可信协调器、发布来源与接收端。根据采集、编码、传输、解码和处理能力确定目标工作范围。传输成功、模型已消费与用户已听到分别记录。
 
-使用 Python 3.11 或更新版本。Windows 激活虚拟环境的命令为 `.venv\Scripts\Activate.ps1`。
+## 2. 设计根时钟与子时钟
 
-## 2. 运行文档示例校验
+配置唯一 `root` 的原点、`frequency_hz`、`standard_frame_bytes`、`standard_frames_per_tick`。子时钟采用正整数父周期和非负整数偏移。逐级计算所有边界到整数根刻度的精确映射，不能舍入。
 
-```sh
-python protocol/validate_examples.py
-```
+例如根为 1,000 Hz，子周期为 100 根刻度，则子时钟为 10 Hz；不是每个根刻度都必须发送消息，也不代表 1 ms 的端到端保证。
 
-校验器检查 JSON Schema、清单资源哈希、事件与回执关联、来源绑定、执行窗口和关键反例。通过意味着文档示例满足这些检查，不代表网络、媒体或真实执行器已经验收。
+## 3. 划分信息同步组
 
-## 3. 读一个完整会话
+为需要共同窗口的内容设置 `sync_group_id`、`clock_id`、`start_tick`。用 `delivery_policy` 声明所选 Profile 的交付规则，用 `limits` 确认整个组的编码容量和每个接收端的队列上限。共享根容量，检查重叠窗口、突发与持续总量。
 
-按顺序打开以下文件：
+## 4. 注册轨道与格式
 
-1. `protocol/examples/counter.profile.json`：计数器的领域能力和执行策略。
-2. `protocol/examples/session.json`：来源、stream、时钟和所选 Profile 的会话清单。
-3. `protocol/examples/streaming-session.json`：同一次操作中的多个事件、独立音频和批量回执。
+每轨引用一个同步组、一个格式，声明角色、方向和允许来源。格式目录使用 `media_type + constraints`；JSON 的 `schema` 与 `schema_ref` 二选一或按 Profile 使用通用 JSON 规则，不能同时存在。双方确认能力后在 epoch 内冻结。
 
-会话先协商清单，再交付 `feedback_seq=0` 的初始反馈 F0。每条消息引用一致的 `session_id`、`epoch` 和 `manifest_id`。
+必须配置唯一的 system 输入轨道。双向两端如需同周期各发一帧，应拆成两条普通单向轨道；不能复制 system 轨道。
 
-## 4. 跟踪两种计数
+## 5. 写清 Profile 的四项职责
 
-**事件在途数**：已经发送、尚未获得首个真实 `core.result` 的事件数量。
+明确播放映射、超时恢复、完整性判断和内容校验的责任方与规则；同时声明 system／assistant 的事件、Schema、输出与任务边界。协调器实际处理中断、关闭和清理，不等待通知交付。
 
-**活动操作数**：已经预占、尚未确认终结的操作数量。
+## 6. 验证设计，再验证实现
 
-两者分别受 Profile 限制。同一个操作可以包含 `begin → update → end` 多条事件。收到 `accepted` 可以释放该事件的在途名额，但不会结束操作；发出 `end` 也不等于清理已经完成。
-
-## 5. 为你的环境制定 Profile
-
-列出领域事件与 payload Schema、状态 Schema、工具能力、具名执行策略及依赖规则，再定义适配器的真实执行和恢复职责。不要仅修改示例的协议字符串或计数器名称就宣称适配完成。
-
-继续阅读[核心与 Profile](spec/01-core-and-profiles.md)、[执行与恢复](spec/04-execution-and-recovery.md)及[示例说明](examples.md)。
+阅读[完整配置示例](examples.md)，检查树、引用、整数映射、单帧名额和共享预算。实现阶段还需分别验证媒体内容、分片、队列、迟到、冲突、恢复和真实时延。本站的文档检查不等于运行时一致性认证。

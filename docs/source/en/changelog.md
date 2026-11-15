@@ -1,20 +1,24 @@
-# Versions and draft status
+# Draft status and implementation scope
 
-## Draft 0.2 · 2026-11-15
+## 2026-11-16 · Current architecture design draft
 
-Wire identifier: `a2rt/0.2`.
+The specification has four chapters: clocks and synchronization groups; media types and negotiation; Core/Profile responsibilities; and system/lifecycle boundaries. The Canvas page records application-specific adaptation requirements.
 
-- Independent track updates, unsolicited environment feedback, and standalone assistant media.
-- Removes the 0.1 `after_reply` decision permit; `output_seq` replaces `round_id`.
-- `reply_to` only associates requests and may recur for progress.
-- Named Profile execution policies, selected by context and frozen within an epoch.
-- Separate limits for active operations and events awaiting their first receipt.
-- Counter-environment fixtures, schemas, and a documentation validator.
+Defined invariants include one root, exact integer-root-tick mapping, at most one data frame per track per period, one mandatory system input, shared capacity and receiver queue limits, and configuration frozen within an epoch.
 
-This draft is incompatible with 0.1. Replacing the version string in old recordings is not a migration.
+## Current deliverables
 
-## Further engineering work
+- Chinese specification and Chinese/English guides.
+- JSON configurations illustrating architecture relationships.
+- Bilingual search and AI retrieval indexes generated from these documents.
+- Repository checks for provenance, illustrative configurations, links, and retrieval.
 
-Production adapters, transport bindings, media availability and integrity, cross-service idempotency, real clock mappings, packet-loss recovery, dependency-cycle detection, and model consumption of observations all need validation.
+## Implementation and validation still needed
 
-The website timeline is an explanatory illustration, not a runtime, benchmark, or interoperability certification.
+A matching new wire protocol version, complete machine definitions, and runtime have not been released. Placeholder example: resources require real Profile definitions. Implementations must separately validate transport framing, reassembly, scheduling, media handling, content validation, and recovery.
+
+Clock and budget settings must match actual capacity. Valid configuration arithmetic does not prove runtime latency, throughput, or synchronization-error targets.
+
+## Provenance
+
+Chinese Core chapters are generated from protocol/ in this repository. The [source record]({{ base }}protocol/SOURCE.json) identifies the upstream commit and file digests. English guides follow the same architecture; the detailed source specification is Chinese.

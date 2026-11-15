@@ -1,24 +1,67 @@
 # Glossary
 
-| Term | Meaning |
-| --- | --- |
-| Track | One of six logical categories of information |
-| Stream | A named stream bound to a track, source, format, and clock |
-| Event | A request or observed fact, depending on direction |
-| Operation | A bounded operation with concurrency and cleanup obligations |
-| Receipt | An executor's `core.result`, associated by event ID |
-| Profile | Domain events, tools, state schemas, and execution policies |
-| Manifest | The negotiated capabilities, frozen within an epoch |
-| Epoch | A generation of session configuration and identity bindings |
-| Actor | A participant, distinct from source device or sender direction |
-| Source | A registered origin of data or events |
-| Context | An environment context bound to a Profile and policy |
-| Binding | Concrete transport, authentication, media, and flow-control rules |
-| `observed_feedback_seq` | The feedback watermark used for an output, not a decision permit |
-| `reply_to` | Feedback association with an output, possibly repeated for progress |
+Current architecture design draft · 2026-11-16.
 
-## Distinctions that matter
+## root
 
-`new` adds data. `reuse` references historical visuals or state. `empty` preserves cached content while reporting availability. `gap` marks missing coverage, not silence.
+The unique time and capacity baseline per epoch, with ID root.
 
-`accepted` is not success. `applied` need not end an operation. `unknown` preserves uncertainty. `cancelled` requires actual termination and cleanup.
+## Child clock
+
+Derives rhythm from a parent period and offset; inherits units without adding capacity.
+
+## Synchronization group
+
+Binds one clock and organizes tracks by common windows with delivery policy and limits.
+
+## Track
+
+Defines role, direction, sources, and format; references one group through sync_group_id.
+
+## Standard frame unit
+
+A byte-capacity unit including A2RT overhead, distinct from a logical data frame.
+
+## Track data frame
+
+At most one logical submission by a track in one group period.
+
+## Group information frame
+
+A collection of distinct tracks’ data frames in one group period; each references its own track_id.
+
+## frame_seq
+
+Zero-based sequence identifying a fixed window; lateness and retries preserve its identity.
+
+## direction / source_binding
+
+Express content role, flow relative to the agent, and trusted publishers; these are distinct.
+
+## delivery_policy
+
+Profile-defined delivery configuration; timer origins, completeness, and timeout actions need Profile semantics.
+
+## limits
+
+Confirmed group encoding capacity and per-receiver queue limits enforced by Core/Binding.
+
+## constraints / format_id
+
+The type selects constraint rules, constraints declare the contract, and format_id references the session catalog.
+
+## epoch
+
+Scope of frozen configuration; negotiated changes enter a new epoch while history keeps its interpretation.
+
+## system
+
+The mandatory unique input role for system notifications from a trusted environment or coordinator.
+
+## delivered_through
+
+A receiver’s contiguous delivery position, not latest arrival or proof of consumption.
+
+## Profile
+
+Defines domain content, output/task boundaries, presentation, recovery, completeness, and validation.

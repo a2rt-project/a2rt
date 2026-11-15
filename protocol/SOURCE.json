@@ -1,0 +1,34 @@
+{
+  "status": "architecture-draft",
+  "revision": "2026-11-16",
+  "wire_protocol_version": null,
+  "source_project": "naoix-web-chat",
+  "source_directory": "docs/design/a2rt",
+  "source_commit": "46a5a962b53ab3ceaeca96bd2eb9a38d8611a60b",
+  "files": {
+    "01-clock-sync-group-track-model.md": {
+      "upstream_sha256": "652e90df153dda48385c708b72aec6eeb8a77250a5566765fc1e8f7c0c0510f3",
+      "local_sha256": "652e90df153dda48385c708b72aec6eeb8a77250a5566765fc1e8f7c0c0510f3"
+    },
+    "02-media-types-and-negotiation.md": {
+      "upstream_sha256": "8ef0c8f5f7997465efe84473e307291cdb77d880d35ceb5e07a9843eeb6da015",
+      "local_sha256": "8ef0c8f5f7997465efe84473e307291cdb77d880d35ceb5e07a9843eeb6da015"
+    },
+    "03-core-profile-responsibilities.md": {
+      "upstream_sha256": "9f8747f999008212b3b8acebc7163bd9598bd081385a132a34b90212cb40a60e",
+      "local_sha256": "9f8747f999008212b3b8acebc7163bd9598bd081385a132a34b90212cb40a60e"
+    },
+    "04-system-track-and-lifecycle.md": {
+      "upstream_sha256": "3f5430c82ba24443d0765e789b3c04a6f8e7f9a27d9ba149cdf7e0a0dc3afae7",
+      "local_sha256": "3f5430c82ba24443d0765e789b3c04a6f8e7f9a27d9ba149cdf7e0a0dc3afae7"
+    },
+    "README.md": {
+      "upstream_sha256": "e33b5ad95dd81f80c7720ebf3b10ea1882b617febd428df498a28f026cdd1ea5",
+      "local_sha256": "6e4237583874bd475a83bfad4df13dee063df38bdf00a97b4870652b671c269d"
+    },
+    "profiles/canvas/README.md": {
+      "upstream_sha256": "bfb52f97a8405326b1c197cd62c9cdd4366bdb64f9319985c43ac504f8995e66",
+      "local_sha256": "c0c6b4bebddb37c8ce5a3ee47450349546ec68eee420a7282339ae7fdbd64bf5"
+    }
+  }
+}

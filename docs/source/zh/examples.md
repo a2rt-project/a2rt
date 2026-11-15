@@ -1,40 +1,38 @@
-# 示例与校验
+# 配置示例与设计检查
 
-示例采用独立的计数器环境，不依赖画布实现。所有 JSON 和校验器都在仓库的 `protocol/` 下。
+当前示例来自[规范第 01 章](spec/01-clock-sync-group-track-model.md)，用于说明架构，不是新线协议的生产消息。下载[完整配置 JSON]({{ base }}assets/architecture-example.json)。示例中的 `example:` 引用是占位符，实际接入需提供 Profile 的真实内容契约。
 
-## 可下载文件
+## 从根时钟计算窗口
 
-| 文件 | 内容 |
-| --- | --- |
-| [session.json]({{ base }}protocol/examples/session.json) | 清单、时钟、来源、stream 和 Profile 引用 |
-| [counter.profile.json]({{ base }}protocol/examples/counter.profile.json) | 计数器事件、工具、状态和策略 |
-| [streaming-session.json]({{ base }}protocol/examples/streaming-session.json) | 连续操作、多事件在途、独立音频、批量回执 |
-| [async-session.json]({{ base }}protocol/examples/async-session.json) | 模态先后到达、工具进展、历史引用和控制查询 |
-| [message.schema.json]({{ base }}protocol/schemas/message.schema.json) | 四种消息和 TrackUpdate 的 JSON Schema |
-| [event.schema.json]({{ base }}protocol/schemas/event.schema.json) | Event 的核心结构 |
-| [manifest.schema.json]({{ base }}protocol/schemas/manifest.schema.json) | 会话能力清单 |
-| [execution-policy.schema.json]({{ base }}protocol/schemas/execution-policy.schema.json) | Profile 执行策略 |
+示例 root 为 1,000 Hz，标准单位 1,024 字节，每根刻度容量为 1 个单位。交互子时钟的父周期为 100，所以交互组窗口长 100 ms。`start_tick=0` 且无偏移时，前三窗为 `[0,100)`、`[100,200)`、`[200,300)` ms。
 
-## 读懂流式示例
+若子时钟偏移 3 根刻度，窗口改为 `[3,103)`、`[103,203)`、`[203,303)` ms。起点无需重合，但窗口边界必须精确落在整数根刻度。
 
-| 顺序 | 发生什么 |
-| --- | --- |
-| F0 | 发布初始反馈，视觉尚未就绪 |
-| O1 / O2 / O3 | 同一操作的 begin、update、end 连续发出 |
-| M1 | assistant 独立发送音频，不占事件窗口 |
-| F1 | 用户的已发生事件，不是 O1～O3 的回执 |
-| F2 | 批量交付三个事件的结果与操作终态 |
-| O4 | 开始新的工具操作 |
-| F3 / F4 | 同一请求先得到 accepted，之后得到 completed |
+## 共享预算，不重复分配
 
-媒体资源采用 `example:` 占位引用，没有可播放的音频或可解码的图像。示例里的采样率和时间间隔只用于说明，不是协议统一要求。
+| 组 | 周期 | 每窗上限 | 每 100 ms 的上限 |
+| --- | --- | --- | --- |
+| interaction | 100 根刻度 | 64 标准单位 | 64 |
+| tactile | 10 根刻度 | 2 标准单位 | 20 |
+| system_control | 10 根刻度 | 1 标准单位 | 10 |
 
-## 校验范围与限制
+三组共 `64 + 10 × 2 + 10 × 1 = 94` 个单位，根预算为 100。这个总量算式只展示共享关系；实际突发、封装开销与交付期限仍需 Binding 和运行时验证。
+
+## 区分内容上限与组容量
+
+媒体格式可声明图片不超过 1,000,000 字节，但 interaction 的 64 个 1,024 字节单位不能容纳一张接近 1 MB 的图片。格式约束与组预算须同时满足，不能以拆片规避任一上限。
+
+## 每轨单帧的位置
+
+`(epoch, sync_group_id, frame_seq, track_id)` 定位一个轨道数据帧。不同轨道可各有一帧；双向状态轨道的双方共享一个位置。原帧重传或分片仍属于原位置，不重复交付；不同内容或来源冲突不能覆盖原帧。
+
+## 本仓库的检查范围
 
 ```sh
-python protocol/validate_examples.py
+python scripts/check_protocol_docs.py
+python scripts/build.py --preview
+python scripts/check_site.py
+npm test --prefix worker
 ```
 
-正例覆盖多事件在途、批量回执、重复关联进展、另一 Profile 的并发操作、视觉先于状态等。反例覆盖窗口溢出、回执关联错误、end 后续接及每事件策略下提前发送等。
-
-校验器没有实际驱动媒体播放、网络超时或输入清理，也不是全协议一致性测试。实际资源就绪、时钟漂移、跨服务去重与恢复必须另行验收。
+这些命令检查文档来源、配置示意的结构与算式、双语网站链接，以及当前 AI 索引与检索行为。它们不验证尚未发布的新运行时。运行时的一致性、内容处理和时延目标仍需独立验证。
