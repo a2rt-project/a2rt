@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Grid and star geometry retained from the supplied mark.
+       Optical stroke weight tuned for 28–34 px navigation icons. -->
+  <g fill="#ffffff" stroke="#18291f" stroke-width="6.5">
+    <!-- 第一行 -->
+    <rect x="14"  y="14"  width="44" height="44" rx="11"/>
+    <rect x="78"  y="14"  width="44" height="44" rx="11"/>
+    <rect x="142" y="14"  width="44" height="44" rx="11"/>
+
+    <!-- 第二行 -->
+    <rect x="14"  y="78"  width="44" height="44" rx="11"/>
+    <rect x="78"  y="78"  width="44" height="44" rx="11"/>
+    <rect x="142" y="78"  width="44" height="44" rx="11"/>
+
+    <!-- 第三行 -->
+    <rect x="14"  y="142" width="44" height="44" rx="11"/>
+    <rect x="78"  y="142" width="44" height="44" rx="11"/>
+    <rect x="142" y="142" width="44" height="44" rx="11"/>
+  </g>
+
+  <!-- Foreground star, with matching optical weight. -->
+  <path
+    d="M100 14
+       C106 70 130 94 186 100
+       C130 106 106 130 100 186
+       C94 130 70 106 14 100
+       C70 94 94 70 100 14 Z"
+    fill="#ffffff"
+    stroke="#18291f"
+    stroke-width="6.5"
+    stroke-linejoin="round"
+  />
+</svg>
