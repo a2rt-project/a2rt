@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ t.title }}</title>
   <meta name="description" content="{{ t.description }}">
-  <meta name="theme-color" content="#0b0e11">
+  <meta name="theme-color" content="#fbfcf9">
   <meta property="og:title" content="{{ t.title }}">
   <meta property="og:description" content="{{ t.description }}">
   <meta property="og:type" content="website">
@@ -13,20 +13,20 @@
   <link rel="canonical" href="{{ canonical }}">
   <link rel="alternate" hreflang="zh-CN" href="{{ origin }}{{ base }}">
   <link rel="alternate" hreflang="en" href="{{ origin }}{{ base }}en/">
-  <link rel="icon" type="image/svg+xml" href="{{ base }}assets/favicon.svg">
-  <link rel="stylesheet" href="{{ base }}assets/site.css">
-  <script src="{{ base }}assets/site.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="{{ base }}assets/favicon.svg?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ base }}assets/site.css?v={{ asset_version }}">
+  <script src="{{ base }}assets/site.js?v={{ asset_version }}" defer></script>
 </head>
 <body data-language="{{ lang }}">
   <a class="skip-link" href="#main">{{ t.skip }}</a>
   <header class="header">
-    <a class="wordmark" href="{{ home }}" aria-label="A2RT {{ t.home }}"><img src="{{ base }}assets/logo.svg" width="133" height="42" alt="A2RT"></a>
+    <a class="wordmark" href="{{ home }}" aria-label="A2RT {{ t.home }}"><img src="{{ base }}assets/logo-symbol.svg?v={{ asset_version }}" width="38" height="38" alt="" aria-hidden="true"><span>A2RT</span></a>
     <button class="menu-toggle" aria-label="{{ t.menu }}" aria-controls="navigation" aria-expanded="false"><span></span><span></span></button>
     <nav id="navigation" aria-label="{{ t.navigation }}">
       <a href="#protocol">{{ t.nav_protocol }}</a><a href="#architecture">{{ t.nav_architecture }}</a><a href="{{ docs }}">Docs <span class="nav-arrow">↗</span></a>
       <span class="nav-divider"></span>
       <a class="language" href="{{ alternate }}" lang="{{ 'en' if lang == 'zh' else 'zh-CN' }}">{{ 'EN' if lang == 'zh' else '中文' }}</a>
-      <a class="github-link" href="{{ repo }}" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+      <a class="github-link" href="{{ repo }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub · a2rt-project/a2rt"><img class="github-icon" src="{{ base }}assets/github.svg?v={{ asset_version }}" width="17" height="17" alt="" aria-hidden="true">GitHub <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
   <main id="main">
@@ -83,7 +83,7 @@
     <section class="faq-section wrap section" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow"><span>04 /</span> BEFORE YOU BUILD</p><h2 id="faq-title">{{ t.faq_title }}</h2></div><div class="faq-list">{% for item in t.faq %}<details><summary>{{ item.question }}<span>+</span></summary><p>{{ item.answer }}</p></details>{% endfor %}</div></section>
     <section class="closing wrap"><div class="closing-mark" aria-hidden="true">↗</div><p class="eyebrow">A PROTOCOL. MANY POSSIBILITIES.</p><h2>{{ t.closing_title }}</h2><p>{{ t.closing_body }}</p><div class="hero-actions"><a class="button primary" href="{{ docs }}">{{ t.read_docs }} →</a><a class="button secondary" href="{{ repo }}" target="_blank" rel="noopener noreferrer">{{ t.contribute }} ↗</a></div></section>
   </main>
-  <footer class="footer wrap"><div><a class="wordmark" href="{{ home }}"><img src="{{ base }}assets/logo.svg" width="114" height="36" alt="A2RT"></a><p>Agent-to-Real-Time Protocol</p></div><nav aria-label="{{ t.footer_navigation }}"><a href="{{ docs }}">Documentation</a><a href="{{ base }}protocol/schemas/message.schema.json">JSON Schema ↗</a><a href="{{ repo }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><span class="footer-status"><span class="status-dot"></span>{{ t.release }}</span><div class="footer-bottom"><span>© {{ year }} A2RT Project</span><span>{{ t.footer_note }}</span><a href="#main">{{ t.back_top }} ↑</a></div></footer>
+  <footer class="footer wrap"><div><a class="wordmark" href="{{ home }}"><img src="{{ base }}assets/logo-symbol.svg?v={{ asset_version }}" width="38" height="38" alt="" aria-hidden="true"><span>A2RT</span></a><p>Agent-to-Real-Time Protocol</p></div><nav aria-label="{{ t.footer_navigation }}"><a href="{{ docs }}">Documentation</a><a href="{{ base }}protocol/schemas/message.schema.json">JSON Schema ↗</a><a href="{{ repo }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><span class="footer-status"><span class="status-dot"></span>{{ t.release }}</span><div class="footer-bottom"><span>© {{ year }} A2RT Project</span><span>{{ t.footer_note }}</span><a href="#main">{{ t.back_top }} ↑</a></div></footer>
   <script type="application/json" id="site-data">{{ client_data|safe }}</script>
 </body>
 </html>

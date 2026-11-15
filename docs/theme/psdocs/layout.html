@@ -20,7 +20,7 @@
   {%- endfor %}
 
   {%- if favicon_url %}
-    <link rel="icon" href="{{ favicon_url }}">
+    <link rel="icon" href="{{ favicon_url }}?v={{ asset_version }}">
   {%- endif %}
 
   {%- block extrahead %}{%- endblock %}

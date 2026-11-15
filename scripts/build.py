@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import os
@@ -88,6 +89,13 @@ def main():
         "manifest": json.loads((ROOT / "protocol/examples/session.json").read_text()),
     }
     jinja = Environment(loader=FileSystemLoader(ROOT / "site"), autoescape=select_autoescape(["html"]))
+    # Refresh cached styles and icons whenever their content changes.
+    asset_hash = hashlib.sha256()
+    for asset in sorted((ROOT / "site/assets").rglob("*")):
+        if asset.is_file():
+            asset_hash.update(asset.relative_to(ROOT / "site/assets").as_posix().encode())
+            asset_hash.update(asset.read_bytes())
+    jinja.globals["asset_version"] = asset_hash.hexdigest()[:12]
     for lang, t in content.items():
         home = cfg["base_path"] + ("en/" if lang == "en" else "")
         client = {"tracks": t["tracks"], "examples": examples, **{key: t[key] for key in ("copy", "copied", "copy_failed")}}

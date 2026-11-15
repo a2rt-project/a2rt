@@ -10,8 +10,9 @@
 
       <a class="ps-brand" aria-label="A2RT Docs" href="{{ pathto(master_doc) }}">
         <img class="ps-brand__logo"
-             src="{{ pathto('_static/logo.svg', 1) }}"
-             alt="" aria-hidden="true" width="114" height="36">
+             src="{{ pathto('_static/logo-symbol.svg', 1) }}?v={{ asset_version }}"
+             alt="" aria-hidden="true" width="34" height="34">
+        <span class="a2rt-brand-name">A2RT</span>
         <span class="ps-brand__text">Docs</span>
       </a>
     </div>
@@ -126,6 +127,7 @@
     {%- set lang_prefix -%}{%- for _ in range(lang_depth) -%}../{%- endfor -%}{%- endset -%}
     {%- set lang_page = pagename ~ (file_suffix or '.html') -%}
     <div class="ps-header__actions"><a class="a2rt-home" href="{{ a2rt_home }}">{{ "官网" if ps_current_language.code == "zh" else "Website" }} ↗</a>
+    <a class="a2rt-github" href="{{ theme_repo_url }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub · a2rt-project/a2rt" title="github.com/a2rt-project/a2rt"><img src="{{ a2rt_base }}assets/github.svg" width="17" height="17" alt="" aria-hidden="true"><span class="a2rt-github__label">GitHub</span></a>
     <div class="ps-lang" data-ps-lang-switcher>
       <button class="ps-lang__button" type="button" aria-label="{{ ps_ui.language_menu }}" aria-haspopup="true" aria-expanded="false" title="{{ ps_ui.language }}" data-ps-lang-toggle>
         <svg aria-hidden="true" focusable="false" class="octicon octicon-globe ps-lang__icon" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align:text-bottom">
