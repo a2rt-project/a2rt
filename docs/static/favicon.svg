@@ -1,25 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <!-- 背后九宫格：3×3 共 9 个小矩形
-       整体范围 x:14~186, y:14~186，与四角星等大
-       每个小矩形 44×44，间距 20 -->
-  <g fill="#ffffff" stroke="#000000" stroke-width="4">
+  <!-- Grid and star geometry retained from the supplied mark.
+       Heavier optical stroke weight for 16–24 px browser icons. -->
+  <g fill="#ffffff" stroke="#18291f" stroke-width="10.5">
     <!-- 第一行 -->
-    <rect x="14"  y="14"  width="44" height="44" rx="10"/>
-    <rect x="78"  y="14"  width="44" height="44" rx="10"/>
-    <rect x="142" y="14"  width="44" height="44" rx="10"/>
+    <rect x="14"  y="14"  width="44" height="44" rx="12"/>
+    <rect x="78"  y="14"  width="44" height="44" rx="12"/>
+    <rect x="142" y="14"  width="44" height="44" rx="12"/>
 
     <!-- 第二行 -->
-    <rect x="14"  y="78"  width="44" height="44" rx="10"/>
-    <rect x="78"  y="78"  width="44" height="44" rx="10"/>
-    <rect x="142" y="78"  width="44" height="44" rx="10"/>
+    <rect x="14"  y="78"  width="44" height="44" rx="12"/>
+    <rect x="78"  y="78"  width="44" height="44" rx="12"/>
+    <rect x="142" y="78"  width="44" height="44" rx="12"/>
 
     <!-- 第三行 -->
-    <rect x="14"  y="142" width="44" height="44" rx="10"/>
-    <rect x="78"  y="142" width="44" height="44" rx="10"/>
-    <rect x="142" y="142" width="44" height="44" rx="10"/>
+    <rect x="14"  y="142" width="44" height="44" rx="12"/>
+    <rect x="78"  y="142" width="44" height="44" rx="12"/>
+    <rect x="142" y="142" width="44" height="44" rx="12"/>
   </g>
 
-  <!-- AI 四角星形，位于九宫格前面，白色填充、黑色描边 -->
+  <!-- Foreground star, with matching optical weight. -->
   <path
     d="M100 14
        C106 70 130 94 186 100
@@ -27,8 +26,8 @@
        C94 130 70 106 14 100
        C70 94 94 70 100 14 Z"
     fill="#ffffff"
-    stroke="#000000"
-    stroke-width="4"
+    stroke="#18291f"
+    stroke-width="10.5"
     stroke-linejoin="round"
   />
 </svg>

@@ -12,8 +12,8 @@ html{scroll-padding-top:110px}body{background:#fcfdfb}.ps-header{background:#fff
 @media(max-width:767px){.ps-header__inner{grid-template-columns:auto minmax(0,1fr) auto}.ps-header__leading{gap:8px}.ps-header .ps-search{min-width:0}.ps-header .ps-search__input{min-width:0}}
 
 /* Match the light landing page and keep the repository within reach. */
-.ps-brand{gap:8px}
-.ps-brand__logo{width:34px;height:34px}
+.ps-brand{gap:7px}
+.ps-brand__logo{width:30px;height:30px}
 .a2rt-brand-name{font:700 22px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:-.6px;color:#18291f}
 .ps-header{box-shadow:0 1px 0 #253c2c03}
 .ps-header .ps-search{border-radius:7px}
@@ -24,4 +24,4 @@ html{scroll-padding-top:110px}body{background:#fcfdfb}.ps-header{background:#fff
 .a2rt-skip{background:#253c2c;color:#fff}
 @media(max-width:768px){.a2rt-github{width:30px;padding:5px;min-height:30px}.a2rt-github__label{display:none}.ps-header__actions{gap:5px}}
 @media(max-width:540px){.a2rt-home,.ps-brand__text{display:none}}
-@media(max-width:768px){.ps-brand__logo{width:29px;height:29px}.a2rt-brand-name{font-size:18px}}
+@media(max-width:768px){.ps-brand__logo{width:28px;height:28px}.a2rt-brand-name{font-size:18px}}

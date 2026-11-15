@@ -319,9 +319,10 @@ h1{font-size:49px}
 /* Light identity: paper surfaces, forest ink and quiet signal colors. */
 .skip-link{background:#253c2c;color:#fff}
 .header{position:relative;background:#fbfcf9;border-bottom-color:#e3e9df}
-.wordmark,.header .wordmark{gap:10px;letter-spacing:-.8px}
-.wordmark img{width:38px;height:38px}
-.footer .wordmark img{width:32px;height:32px}
+.wordmark,.header .wordmark{gap:9px;letter-spacing:-.8px}
+.wordmark img{width:34px;height:34px}
+.footer .wordmark img{width:28px;height:28px}
+@media(max-width:540px){.header .wordmark img{width:32px;height:32px}}
 .header nav{font-size:13px}
 .github-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 13px;border:1px solid #cdd9c8;border-radius:6px;background:#fff;color:#243d2a;font-weight:600;white-space:nowrap}
 .github-link:hover{background:#eff5e9;border-color:#a9c298}
