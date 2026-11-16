@@ -1,7 +1,7 @@
 {
   "zh": {
-    "title": "A2RT — 智能体实时多模态交互协议",
-    "description": "A2RT 用标准根时钟、信息同步组与自定义轨道组织智能体和实时环境之间的多模态信息。了解当前架构草案、容量约束与 Profile 职责。",
+    "title": "A2RT — 面向智能体与环境的实时业务信息交互协议",
+    "description": "A2RT 提供可配置的多轨信息通道和统一时间契约。了解谁发送谁负责、Profile 异常策略，以及 Canvas Realtime 本地验证实例。",
     "skip": "跳到主要内容",
     "home": "首页",
     "menu": "展开导航",
@@ -11,10 +11,10 @@
     "release": "2026.11 · 架构设计草案",
     "hero_first": "不同节奏，",
     "hero_second": "共同的时间。",
-    "hero_description": "声音、画面与操作，共享时间刻度，各有更新节拍。A2RT 用时钟、信息同步组和自定义轨道，组织智能体与实时环境之间的信息交互。",
+    "hero_description": "声音、画面与操作，共享时间刻度，各有更新节拍。A2RT 为智能体与环境提供可配置的多轨信息通道，约定交换什么、何时交付，以及何时可以消费。",
     "start": "开始阅读",
     "explore": "探索同步组",
-    "hero_note": "统一时间 · 按组同步 · Profile 定义语义",
+    "hero_note": "统一时间 · 谁发送谁负责 · Profile 定义契约",
     "console_label": "根时钟与独立信息同步组的配置示意",
     "illustration": "时钟与同步组",
     "console_caption": "取自规范配置示例 · 数值用于说明关系，不代表性能或时延保证",
@@ -22,7 +22,7 @@
     "strip_two": "独立同步组 · 自定义轨道",
     "strip_three": "共同预算，明确边界",
     "protocol_title": "让实时信息，有序相遇。",
-    "protocol_intro": "从统一刻度到共同窗口，再到具体内容。A2RT 把时间、容量和同步关系说清楚，让不同环境按自己的规则协作。",
+    "protocol_intro": "A2RT 是面向智能体与环境的实时业务信息交互协议。时间、容量与同步关系共同约定，让接收方获得满足消费条件的信息。",
     "principles": [
       {
         "title": "同一刻度，不同节拍",
@@ -33,14 +33,14 @@
         "body": "同组内容使用共同窗口，各接收端按 Profile 判断完整性。多个组可以共享时钟，仍然独立推进。"
       },
       {
-        "title": "通用机制，领域契约",
-        "body": "Core 固定身份、引用、帧数和预算约束。Profile 定义播放、恢复、完整性与内容校验，适配器报告真实结果。"
+        "title": "谁发送，谁负责",
+        "body": "双方发送端组织、对齐并校验信息，承担发送侧恢复；接收端验收后消费。模型专注理解与业务输出，无需拼包或修复传输。"
       }
     ],
     "architecture_title": "清楚的边界，\n可扩展的环境。",
-    "architecture_intro": "时间组织与承载规则在 Core 中保持一致。具体事件、媒体处理和任务语义由 Profile 声明，运行时与传输绑定落实。",
+    "architecture_intro": "Core、Profile、Binding 划分规范职责；发送端、接收端、适配器与运行时落实这些职责。同一进程可以承担多项工作，职责仍然清晰。",
     "architecture_link": "阅读 Core 与 Profile 职责",
-    "architecture_note": "当前为架构设计草案。对应的新线协议版本、完整机器定义和运行时尚未发布。",
+    "architecture_note": "当前为架构设计草案。Canvas Realtime 已有本地 mock、配置与 Schema；尚未发布覆盖全部约束的通用线协议和运行时。",
     "layers": [
       {
         "name": "A2RT Core",
@@ -55,27 +55,17 @@
       {
         "name": "Profile",
         "subtitle": "定义内容与交互规则",
-        "body": "声明 system 与 assistant 内容契约、输出和任务边界，并定义播放、恢复、同步完整性及内容校验。",
+        "body": "声明内容语义、消费条件、同步完整性、播放和执行规则；选择异常丢弃、通知、恢复或终止的策略。",
         "tags": [
-          "Presentation",
-          "Recovery",
+          "Consumption",
+          "Exceptions",
           "Validation"
-        ]
-      },
-      {
-        "name": "Adapter / Application",
-        "subtitle": "处理内容，执行真实操作",
-        "body": "按 Profile 解码、校验、判断就绪、呈现和执行；区分收到、交付、消费与完成，保留真实来源时间。",
-        "tags": [
-          "Decode",
-          "Execute",
-          "Report"
         ]
       },
       {
         "name": "Binding",
         "subtitle": "落实节拍与资源预算",
-        "body": "处理连接、来源绑定、分片与重组，落实发送调度、容量和队列上限；传输成功不代表业务完成。",
+        "body": "落实序列化、连接与来源绑定、传输重组、发送调度和队列约束，复用底层传输能力；传输成功不代表业务完成。",
         "tags": [
           "Transport",
           "Reassembly",
@@ -110,12 +100,16 @@
     "faq_title": "实现之前，\n先对齐这些约定。",
     "faq": [
       {
-        "question": "当前架构已经有可用 SDK 或新线协议了吗？",
-        "answer": "尚未发布与当前架构匹配的新线协议版本、完整机器定义或运行时。文档中的 JSON 用于说明设计；当前实现状态以新版架构文档为准。"
+        "question": "现在有哪些可以检查的实现？",
+        "answer": "Canvas Realtime 提供 0.3.0-draft Profile、会话配置、内容 Schema 和本地 mock 的验证文档，包含 10Hz 交互与真实 L16 音频流。它尚未接入真实模型，也不代表覆盖全部约束的通用 SDK、线协议或生产运行时。"
       },
       {
         "question": "A2RT 固定只有六条轨道吗？",
         "answer": "轨道可以按需注册。Canvas 的配置包含六条领域轨道，另外必须配置唯一的 system 输入轨道。角色与方向只定义在轨道上。"
+      },
+      {
+        "question": "Core 是否要求错误消息或逐帧 ACK？",
+        "answer": "不要求。Profile 可以选择直接丢弃、通过自定义轨道或独立通道通知，并决定恢复或终止。system 是必选输入轨道，但不是强制错误通道；异常策略仍须遵守帧数、容量和真实交付状态约束。"
       },
       {
         "question": "同步组会让所有内容互相等待吗？",
@@ -225,7 +219,7 @@
   },
   "en": {
     "title": "A2RT — Agent-to-Real-Time Protocol",
-    "description": "A2RT organizes multimodal interaction between agents and real-time environments through a shared root clock, synchronization groups, and configurable tracks.",
+    "description": "A2RT is a real-time business-information protocol for agents and environments, with configurable tracks, shared time, sender responsibilities, and Profile-defined delivery.",
     "skip": "Skip to content",
     "home": "Home",
     "menu": "Toggle navigation",
@@ -235,10 +229,10 @@
     "release": "2026.11 · Architecture draft",
     "hero_first": "Different rhythms.",
     "hero_second": "Shared time.",
-    "hero_description": "Audio, visuals, and actions share a time coordinate, with their own update rhythms. A2RT organizes interaction through clocks, synchronization groups, and configurable tracks.",
+    "hero_description": "Audio, visuals, and actions share time, with their own rhythms. A2RT gives agents and environments configurable tracks and a contract for what to exchange, when to deliver, and when to consume.",
     "start": "Read the docs",
     "explore": "Explore sync groups",
-    "hero_note": "Shared time · Grouped delivery · Profile semantics",
+    "hero_note": "Shared time · Sender responsibility · Profile contracts",
     "console_label": "Configuration illustration of a root clock and independent synchronization groups",
     "illustration": "Clocks & sync groups",
     "console_caption": "From the draft configuration · Illustrative values, not latency or performance guarantees",
@@ -246,7 +240,7 @@
     "strip_two": "INDEPENDENT GROUPS · CONFIGURABLE TRACKS",
     "strip_three": "SHARED CAPACITY. EXPLICIT BOUNDARIES.",
     "protocol_title": "Give real-time information a common ground.",
-    "protocol_intro": "A shared coordinate. Common windows. Explicit content contracts. A2RT makes time, capacity, and synchronization relationships clear across environments.",
+    "protocol_intro": "A2RT is a real-time business-information protocol for agents and environments. Time, capacity, and synchronization contracts make information ready for its receiver to consume.",
     "principles": [
       {
         "title": "Shared time, different rhythms",
@@ -257,14 +251,14 @@
         "body": "Tracks in a group share windows. Each receiver applies its Profile’s completeness rules. Groups may share a clock and still advance independently."
       },
       {
-        "title": "Common rules, domain contracts",
-        "body": "Core fixes identities, references, frame counts, and budgets. Profiles define presentation, recovery, completeness, and content validation."
+        "title": "The sender prepares the information",
+        "body": "Both senders organize, align, and validate information and own send-side recovery. Receivers admit usable content. Models reason and produce business output, without packet repair."
       }
     ],
     "architecture_title": "Clear boundaries.\nRoom for your world.",
-    "architecture_intro": "Core keeps time and carriage rules consistent. Profiles specify events, media processing, and task semantics. Runtime and transport implementations make those contracts work.",
+    "architecture_intro": "Core, Profile, and Binding define normative responsibilities. Senders, receivers, adapters, and runtimes implement them. One process may serve several roles without merging their responsibilities.",
     "architecture_link": "Read Core & Profile responsibilities",
-    "architecture_note": "This is an architecture design draft. A matching new wire version, complete machine definitions, and runtime have not been released.",
+    "architecture_note": "Architecture design draft. Canvas Realtime has a local mock, configuration, and schemas. A general wire release and runtime covering all constraints are not yet available.",
     "layers": [
       {
         "name": "A2RT Core",
@@ -279,27 +273,17 @@
       {
         "name": "Profile",
         "subtitle": "Content and interaction contracts",
-        "body": "Define system and assistant content, output and task boundaries, presentation, recovery, synchronization completeness, and content validation.",
+        "body": "Define content semantics, consumption conditions, completeness, presentation, and execution. Choose whether to discard, notify, recover, or terminate after errors.",
         "tags": [
-          "Presentation",
-          "Recovery",
+          "Consumption",
+          "Exceptions",
           "Validation"
-        ]
-      },
-      {
-        "name": "Adapter / Application",
-        "subtitle": "Process content and act",
-        "body": "Decode, validate, present, and execute under the Profile. Distinguish receipt, delivery, consumption, and completion while preserving source time.",
-        "tags": [
-          "Decode",
-          "Execute",
-          "Report"
         ]
       },
       {
         "name": "Binding",
         "subtitle": "Make timing and budgets operational",
-        "body": "Connections, trusted sources, fragmentation, and reassembly. Enforce scheduling, capacity, and queue limits; transport success is not business completion.",
+        "body": "Map serialization, connections, source binding, reassembly, pacing, and queues to transport capabilities. Transport success does not prove business completion.",
         "tags": [
           "Transport",
           "Reassembly",
@@ -334,12 +318,16 @@
     "faq_title": "Before you implement.",
     "faq": [
       {
-        "question": "Is there an SDK or wire version for this architecture?",
-        "answer": "A matching new wire version, complete machine definitions, and runtime have not been released. JSON examples explain the design. The current architecture documents define the implementation scope."
+        "question": "What implementation can I inspect today?",
+        "answer": "Canvas Realtime documents a 0.3.0-draft Profile, session configuration, content schemas, and a local mock with 10 Hz interaction and actual L16 audio. It has no real model integration and is not a general SDK, wire release, or production runtime covering all constraints."
       },
       {
         "question": "Does A2RT have exactly six tracks?",
         "answer": "Tracks are registered as needed. Canvas uses six domain tracks plus the mandatory, unique system input track. Role and direction are defined only on tracks."
+      },
+      {
+        "question": "Does Core require error messages or per-frame ACKs?",
+        "answer": "No. A Profile may silently discard, notify through a custom track or separate channel, and choose recovery or termination. The required system input is not a mandatory error channel. Frame limits, budgets, and truthful delivery state still apply."
       },
       {
         "question": "Does synchronization make everything wait?",

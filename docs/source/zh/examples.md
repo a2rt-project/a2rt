@@ -35,4 +35,10 @@ python scripts/check_site.py
 npm test --prefix worker
 ```
 
-这些命令检查文档来源、配置示意的结构与算式、双语网站链接，以及当前 AI 索引与检索行为。它们不验证尚未发布的新运行时。运行时的一致性、内容处理和时延目标仍需独立验证。
+这些命令检查文档来源、配置示意的结构与算式、双语网站链接，以及当前 AI 索引与检索行为。它们不执行 Canvas 本地 mock，也不证明通用运行时合规。运行时的一致性、内容处理和时延目标仍需独立验证。
+
+## 当前 Canvas Realtime 配置
+
+[Canvas Realtime](profiles/canvas-realtime/index.md) 提供可检查的 [Profile]({{ base }}protocol/profiles/canvas-realtime/profile.json) 和 [会话配置]({{ base }}protocol/profiles/canvas-realtime/session.json)。该实例为 1,000Hz 根时钟、10Hz 交互与 100Hz 独立通知，共七条协议轨道；不要与上面的通用配置示意混用。
+
+它使用真实 24kHz 单声道 L16 字节：100ms 对应 2,400 个样本、4,800 字节。观察由发送端准备，接入层验收；超时由运行时在下一个合法周期重新采集。详见[交互契约](profiles/canvas-realtime/interaction.md)和[二进制 Binding](profiles/canvas-realtime/binary-binding.md)。这些是本地 Profile 选择，不代表 Core 强制的错误通知或恢复流程。

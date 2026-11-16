@@ -1,16 +1,16 @@
 # Integration design steps
 
-Start with architecture configuration and a Profile contract. There is no matching new SDK, wire schema, or runtime yet; these are design steps, not instructions for launching a production session.
+Start with architecture configuration and a Profile contract. Canvas Realtime has a local mock and machine definitions to inspect. A general wire release and production runtime remain unavailable; these are integration design steps.
 
 ## 1. Identify participants and capacity
 
-Identify the agent endpoint, environment endpoint, trusted coordinator, publishers, and receivers. Define an operating range using capture, encoding, transport, decoding, and processing capacity. Record transport receipt, model consumption, and user presentation as distinct facts.
+Identify the agent endpoint, environment endpoint, trusted coordinator, publishers, and receivers. Define an operating range using capture, encoding, transport, decoding, and processing capacity. Assign preparation, validation, and send-side recovery to the sender in each direction; the receiver admits information only after validation. Record transport receipt, model consumption, and user presentation as distinct facts.
 
 ## 2. Design the clock tree
 
 Configure the unique root origin, `frequency_hz`, `standard_frame_bytes`, and `standard_frames_per_tick`. Child periods are positive integers in parent ticks; offsets are nonnegative integers. Check exact integer-root-tick mapping along the tree without rounding.
 
-A 1,000 Hz root with a child period of 100 root ticks yields a 10 Hz child. This does not require a message at every root tick or guarantee 1 ms end-to-end latency.
+A 1,000 Hz root with a child period of 100 root ticks yields a 10 Hz child. This does not require a message at every root tick or guarantee 1 ms end-to-end latency. Match information frequency to actual production and consumption. A 20 ms internal retry timer does not raise the model information rate; recaptured observations still need a legal publication period.
 
 ## 3. Define synchronization groups
 
@@ -24,8 +24,8 @@ Exactly one system input track is required. If both sides must publish separate 
 
 ## 5. Specify Profile responsibilities
 
-Define presentation mapping, timeout recovery, completeness, and content validation, including responsible implementations. Specify system/assistant events and schemas and any output/task boundaries. The coordinator performs interruption, closure, and cleanup without waiting for notification delivery.
+Define presentation mapping, timeout recovery, completeness, and content validation, including responsible implementations. Specify system/assistant events and schemas and any output/task boundaries. Choose silent discard or explicit notification/recovery/termination. Core mandates no error code, per-frame ACK, retransmission request, or dedicated error track. Define notification scope, source, carrier, failure handling, and delivery after gaps. The coordinator performs interruption, closure, and cleanup without waiting for notification delivery.
 
 ## 6. Validate design and implementation separately
 
-Explore the [complete configuration](examples.md). Check tree structure, references, integer mapping, single-frame slots, and shared budgets. Implementation validation also needs media handling, fragmentation, queues, late data, conflicts, recovery, and real latency. Documentation checks are not runtime conformance certification.
+Explore the [complete configuration](examples.md). Check tree structure, references, integer mapping, single-frame slots, and shared budgets. Implementation validation also needs media handling, fragmentation, queues, late data, conflicts, recovery, and real latency. Compare the [Canvas Realtime](profiles/canvas-realtime/index.md) 10 Hz observation and L16 byte contracts. Documentation checks are not runtime conformance certification.

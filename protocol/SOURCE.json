@@ -4,31 +4,75 @@
   "wire_protocol_version": null,
   "source_project": "naoix-web-chat",
   "source_directory": "docs/design/a2rt",
-  "source_commit": "46a5a962b53ab3ceaeca96bd2eb9a38d8611a60b",
+  "source_commit": "13f77d8548869af745de070e2b92792a86fc131f",
   "files": {
     "01-clock-sync-group-track-model.md": {
-      "upstream_sha256": "652e90df153dda48385c708b72aec6eeb8a77250a5566765fc1e8f7c0c0510f3",
-      "local_sha256": "652e90df153dda48385c708b72aec6eeb8a77250a5566765fc1e8f7c0c0510f3"
+      "upstream_sha256": "6db50f3db609347db88277671c9e2ebf378b66c2ce3344f32fdb558465805a3f",
+      "local_sha256": "6db50f3db609347db88277671c9e2ebf378b66c2ce3344f32fdb558465805a3f"
     },
     "02-media-types-and-negotiation.md": {
-      "upstream_sha256": "8ef0c8f5f7997465efe84473e307291cdb77d880d35ceb5e07a9843eeb6da015",
-      "local_sha256": "8ef0c8f5f7997465efe84473e307291cdb77d880d35ceb5e07a9843eeb6da015"
+      "upstream_sha256": "7152236e5615aa1ac5cb1f867c7e33ced5ea7067634999f2812b6c9b63d6bc74",
+      "local_sha256": "7152236e5615aa1ac5cb1f867c7e33ced5ea7067634999f2812b6c9b63d6bc74"
     },
     "03-core-profile-responsibilities.md": {
-      "upstream_sha256": "9f8747f999008212b3b8acebc7163bd9598bd081385a132a34b90212cb40a60e",
-      "local_sha256": "9f8747f999008212b3b8acebc7163bd9598bd081385a132a34b90212cb40a60e"
+      "upstream_sha256": "d2b6ded0c6b64c87a5cb70b77f0d68e899c3c1b99db10ef13692b2e2cc52bd02",
+      "local_sha256": "d2b6ded0c6b64c87a5cb70b77f0d68e899c3c1b99db10ef13692b2e2cc52bd02"
     },
     "04-system-track-and-lifecycle.md": {
-      "upstream_sha256": "3f5430c82ba24443d0765e789b3c04a6f8e7f9a27d9ba149cdf7e0a0dc3afae7",
-      "local_sha256": "3f5430c82ba24443d0765e789b3c04a6f8e7f9a27d9ba149cdf7e0a0dc3afae7"
+      "upstream_sha256": "dc8f0383b330cec48c5a2747842b9a9d0abf1c620629ad389d3141caccf95055",
+      "local_sha256": "dc8f0383b330cec48c5a2747842b9a9d0abf1c620629ad389d3141caccf95055"
     },
     "README.md": {
-      "upstream_sha256": "e33b5ad95dd81f80c7720ebf3b10ea1882b617febd428df498a28f026cdd1ea5",
-      "local_sha256": "6e4237583874bd475a83bfad4df13dee063df38bdf00a97b4870652b671c269d"
+      "upstream_sha256": "74a88ac88bc3fac091d69e31cdbea47ceff003068cbe3940b28f109d869cb18b",
+      "local_sha256": "7085ddda2e1d49c9661759c78052a177339992feceeb8fcbb6bba11d388b2d46"
     },
     "profiles/canvas/README.md": {
-      "upstream_sha256": "bfb52f97a8405326b1c197cd62c9cdd4366bdb64f9319985c43ac504f8995e66",
-      "local_sha256": "c0c6b4bebddb37c8ce5a3ee47450349546ec68eee420a7282339ae7fdbd64bf5"
+      "upstream_sha256": "2a393fd55aab2333db15dabee6b93819587e681995b8e21579a63c3d09d9a83a",
+      "local_sha256": "8f2a3ed203cb348e6204e7d53846dd336c2d8ddc11fcce0f199899587b9c6fdc"
+    },
+    "profiles/canvas-realtime/01-interaction-and-delivery.md": {
+      "upstream_sha256": "a85a228d57e296d6dca2c789a48734bd7a2fede91cb7eb7d7c9efc28ef800596",
+      "local_sha256": "03e26384dcf91f00ab7e25c864afdfe4c1dd0736c165a2af1e55349a720d1b70"
+    },
+    "profiles/canvas-realtime/02-binary-binding.md": {
+      "upstream_sha256": "fd9afc4b8503fea99262541c8545c56d3873ab5a286f2afb9ae91b6138e1e229",
+      "local_sha256": "33f8c7c973b0e6b1b725552dec5143ac00245f972329d8d5e446496d0d9000b1"
+    },
+    "profiles/canvas-realtime/README.md": {
+      "upstream_sha256": "a85aef13075ee106e1f7ed4fd3d580440ec206c6f44cfcfe5318652350174b07",
+      "local_sha256": "fbfdada6ccf72404427451c58a6ce0b4adf577ac6da6231ef756c4f5353dd87c"
+    },
+    "profiles/canvas-realtime/profile.json": {
+      "upstream_sha256": "8e0c6c6afe3b2829a6da7aabfac924cd32aefe329a1310e57b54c7863289a741",
+      "local_sha256": "8e0c6c6afe3b2829a6da7aabfac924cd32aefe329a1310e57b54c7863289a741"
+    },
+    "profiles/canvas-realtime/schemas/audio-metadata.schema.json": {
+      "upstream_sha256": "0ffddff5aa968dd951b538302f604fa11dc432aaeafcbe9933b1bfdad8b92999",
+      "local_sha256": "0ffddff5aa968dd951b538302f604fa11dc432aaeafcbe9933b1bfdad8b92999"
+    },
+    "profiles/canvas-realtime/schemas/event.schema.json": {
+      "upstream_sha256": "3202ac6cd9f7284f3c20556ef833c70995bcacdca7cf046bad8feb5b4f0c9121",
+      "local_sha256": "3202ac6cd9f7284f3c20556ef833c70995bcacdca7cf046bad8feb5b4f0c9121"
+    },
+    "profiles/canvas-realtime/schemas/packet.schema.json": {
+      "upstream_sha256": "94551844ab6eb779e163a19069788fbfa7a34042c51276cdc8bef1a8330275ba",
+      "local_sha256": "94551844ab6eb779e163a19069788fbfa7a34042c51276cdc8bef1a8330275ba"
+    },
+    "profiles/canvas-realtime/schemas/state.schema.json": {
+      "upstream_sha256": "0012b43d9a2110f0ebab974bd3cda2b7d9be2e714c65da26cc84449526ffc5a8",
+      "local_sha256": "0012b43d9a2110f0ebab974bd3cda2b7d9be2e714c65da26cc84449526ffc5a8"
+    },
+    "profiles/canvas-realtime/schemas/system.schema.json": {
+      "upstream_sha256": "ed737828f64b6d52e4d3df8e5d332fb2f103e15a43f395dc73c06bb9180e710e",
+      "local_sha256": "ed737828f64b6d52e4d3df8e5d332fb2f103e15a43f395dc73c06bb9180e710e"
+    },
+    "profiles/canvas-realtime/schemas/visual.schema.json": {
+      "upstream_sha256": "3f4bdfd6094c620bd7f9643f1c8e00c20c3adb9e56ff8474fad0f22c677a4290",
+      "local_sha256": "3f4bdfd6094c620bd7f9643f1c8e00c20c3adb9e56ff8474fad0f22c677a4290"
+    },
+    "profiles/canvas-realtime/session.json": {
+      "upstream_sha256": "278238d686253e4d10798110dc7d2e921094dac2f02ba14cabee0f998fd0f912",
+      "local_sha256": "278238d686253e4d10798110dc7d2e921094dac2f02ba14cabee0f998fd0f912"
     }
   }
 }

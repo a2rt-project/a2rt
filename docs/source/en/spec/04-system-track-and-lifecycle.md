@@ -20,7 +20,7 @@ The group's delivery rules belong in `delivery_policy`, and capacity plus receiv
 
 Actual interruption, closure, and cleanup are performed by the coordinator/runtime under the Profile and must not wait for media completion or model understanding of a notification. Notification sent is not proof of processing completed.
 
-The selected Profile, system format, and configuration must be confirmed before receiving system content. Initial connection/configuration exchange and transport ACK do not depend on a fixed notification event name. ACK confirms a transport fact, not that the model stopped, a task was cleaned up, or the session closed.
+The selected Profile, system format, and configuration must be confirmed before receiving system content. Initial connection/configuration exchange and transport ACK do not depend on a fixed notification event name. Core does not require per-frame ACKs. When the Binding uses transport ACKs, they confirm only the transport fact defined by that Binding, not that the model stopped, a task was cleaned up, or the session closed.
 
 ## Three distinct ending boundaries
 
@@ -55,4 +55,8 @@ The following names are examples of one hypothetical Profile, not Core standard 
 
 For an explanation followed by another user question, a Profile may report output end while keeping the session active. For a closure request, the request alone is not the closure fact. For interrupted generation, an adapter may report a real provider terminal result under the Profile; it must not fabricate completion merely because an interrupt was issued, nor require an interrupted model to generate another acknowledgement.
 
-Canvas retains six domain tracks plus the mandatory unique system input. Its group, notification schema, output identifiers, and concrete event names require a versioned Canvas contract; this illustrative list does not define them.
+[Canvas Realtime](../profiles/canvas-realtime/index.md) publishes a current versioned contract for its six business tracks and unique system input. Its concrete event catalog is defined by that Profile, not by the illustrative list above.
+
+## Required system input, optional error notification
+
+The system track is required, but it is not a Core-mandated error-reporting channel. A Profile may silently discard or notify through custom tracks, separate channels, or another agreed mechanism. If it selects system for an exception, the trusted coordinator publishes under the system input contract. It cannot add a second system track or make system bidirectional. Off-track notices cannot impersonate system authority or bypass session/configuration constraints.

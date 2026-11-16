@@ -2,17 +2,19 @@
 
 **Agent-to-Real-Time Protocol · Architecture design draft · 2026-11-16**
 
-A2RT defines information carriage and synchronization between agents and real-time environments. A standard root clock supplies time and capacity; child clocks organize update rhythms; synchronization groups define common windows; configurable tracks carry roles, directions, and content.
+A2RT is a real-time business-information protocol for agents and environments, providing configurable tracks and a shared time contract. A standard root clock supplies time and capacity; child clocks organize update rhythms; synchronization groups define common windows; configurable tracks carry roles, directions, and content.
 
 ```{note}
-A matching new wire protocol version, complete machine definitions, and runtime have not been released. Configuration examples illustrate the design. Configuration checks do not validate runtime behavior. This English guide covers the current rules; the Chinese specification is the detailed source text.
+Canvas Realtime provides a 0.3.0-draft Profile, session configuration, schemas, and documentation of a partial local mock. A general wire release and runtime covering all current constraints remain unavailable. Local validation does not establish production readiness or real model integration. This guide follows the current detailed Chinese specification.
 ```
+
+Senders prepare consumable information and own send-side recovery; receivers validate it. Models do not assemble packets or retry transport. Profiles choose discard, notification, and recovery policies; Core does not mandate error-control messages or per-frame ACKs.
 
 ## Start here
 
 Read the [overview](overview.md), then follow the [integration design steps](quickstart.md). Explore [configuration examples](examples.md) for window and capacity arithmetic. See [draft status](changelog.md) for the current implementation scope.
 
-## Four layers of organization
+## Four levels of time and information
 
 <img src="{{ base }}assets/clock-groups.svg" alt="Root clock, child clocks, synchronization groups, and tracks">
 
@@ -25,6 +27,7 @@ Sharing a clock does not create a shared waiting barrier. Each receiver applies 
 | Separate common mechanisms from domain behavior | [Core and Profile responsibilities](spec/03-core-profile-responsibilities.md) |
 | Distinguish notifications and lifecycle boundaries | [System track and lifecycle](spec/04-system-track-and-lifecycle.md) |
 | See the choices for a collaborative canvas | [Canvas adaptation](profiles/canvas.md) |
+| Inspect 10 Hz interaction, binary audio, and runtime recovery | [Canvas Realtime](profiles/canvas-realtime/index.md) |
 
 ```{toctree}
 :caption: Get started
@@ -52,6 +55,7 @@ spec/04-system-track-and-lifecycle
 :hidden:
 
 profiles/canvas
+profiles/canvas-realtime/index
 ```
 
 ```{toctree}

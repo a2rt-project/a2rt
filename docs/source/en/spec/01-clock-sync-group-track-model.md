@@ -1,6 +1,6 @@
 # Root clocks, synchronization groups, and tracks
 
-**Architecture design draft · 2026-11-16.** This guide follows the current Chinese specification. Examples describe design relationships; a matching new wire schema and runtime have not been released.
+**Architecture design draft · 2026-11-16.** This guide follows the current Chinese specification. Examples describe design relationships; the Canvas local mock implements only part of the design, not a generally released wire schema or complete runtime.
 
 ## Four layers
 
@@ -100,3 +100,9 @@ Runtime records include frame sequence/window, completeness and missing members,
 Clocks, group identity, policies, limits, tracks, and selected formats are frozen within an epoch. Changes require negotiation and a new epoch, preserving old coordinate mappings and recorded facts. Recovery does not replace occupied data-frame positions or rewrite a failure into an earlier success.
 
 The [complete configuration example](../examples.md) uses 94 of 100 units per 100 ms across three groups. It illustrates capacity sharing, not burst scheduling or a runtime performance guarantee. Canvas's task limits and synchronized delivery are [Profile choices](../profiles/canvas.md), not consequences of a clock or frame number.
+
+## Information cadence and admission
+
+Information clocks follow actual production and consumption. A 10 Hz interaction organizes 100 ms observations; finer root ticks, polling, fragments, and internal retries do not require a faster model information rate. New recovery observations occupy legal unoccupied periods. Senders prepare and validate aligned information before transmission; receiver ingress checks readiness before exposing content to the model. Intermediate assembly state is not automatically model input.
+
+Rejecting a frame means it cannot be accepted as valid. It does not require a fixed error message. Profiles may silently discard or select notification and recovery mechanisms; Core does not mandate error-control messages or per-frame ACKs. Frame identity, integer time, queue limits, shared budgets, and truthful delivery state still apply. See [responsibilities](03-core-profile-responsibilities.md).

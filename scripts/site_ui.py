@@ -64,8 +64,8 @@ _UI_TEXT = {
     },
 }
 _SEARCH_EXAMPLES = {
-    "zh": ["根时钟与同步组是什么关系？", "每轨每周期最多一个数据帧是什么意思？", "system 轨道必须独立成组吗？", "Core 与 Profile 各负责什么？"],
-    "en": ["How do root clocks and sync groups relate?", "What does one data frame per track per period mean?", "Must the system track have its own group?", "What do Core and Profiles each define?"],
+    "zh": ["根时钟与同步组是什么关系？", "每轨每周期最多一个数据帧是什么意思？", "谁发送谁负责，模型需要处理重传吗？", "Core 是否强制错误通知或 ACK？"],
+    "en": ["How do root clocks and sync groups relate?", "What does one data frame per track per period mean?", "Who prepares information and handles send-side recovery?", "Does Core require error notifications or ACKs?"],
 }
 
 def shell_context(config, language, page=None):

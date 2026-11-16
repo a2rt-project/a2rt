@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "type": {
+      "enum": [
+        "session.started",
+        "observation.timeout",
+        "observation.recovered",
+        "session.suspended",
+        "task.cleaned",
+        "session.ended"
+      ]
+    },
+    "at": {
+      "type": "object",
+      "properties": {
+        "clock_id": {
+          "const": "root"
+        },
+        "tick": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "clock_id",
+        "tick"
+      ],
+      "additionalProperties": false
+    },
+    "details": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "type",
+    "at",
+    "details"
+  ],
+  "additionalProperties": false
+}

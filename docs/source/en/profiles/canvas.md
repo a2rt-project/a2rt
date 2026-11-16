@@ -1,6 +1,6 @@
 # Canvas Profile adaptation requirements
 
-**Current architecture requirements · 2026-11-16.** A matching new machine-readable Canvas Profile has not been released. This page records Canvas choices without defining a universal Core event enumeration.
+**Current architecture requirements · 2026-11-16.** This page records Canvas choices without defining a universal Core event enumeration. [Canvas Realtime](canvas-realtime/index.md) supplies a current 0.3.0-draft Profile, session configuration, schemas, and a partial local mock.
 
 ## Tracks and groups
 
@@ -36,4 +36,10 @@ Confirm clocks, groups, tracks, and formats before integration. Implement intege
 
 System carries trusted input notifications only. Model requests and output boundaries use assistant output tracks. The coordinator performs interruption and cleanup without waiting for notification delivery.
 
-The current requirements still need matching machine definitions and runtime implementation. Configuration arithmetic and documentation checks alone do not validate these behaviors.
+Canvas Realtime uses 10 Hz interaction, native Excalidraw rendering, actual L16 audio over local HTTP, shared ingress validation, and runtime recovery. It does not connect a real model or provide production recovery. Its deterministic mock does not implement the full Excalidraw collaboration conflict algorithm. Configuration arithmetic and documentation checks alone do not validate all current architecture requirements.
+
+## Sender responsibilities and exception choices
+
+The environment sender assembles aligned visual/state snapshots, audio coverage, and event/result associations. Model ingress validates and admits consumable observations. In the other direction, the model service/adapter organizes audio/actions and their time relations; the environment validates, plays, executes, and reports actual results. Each sender owns its send-side recovery. Tool execution failure can be valid business feedback, distinct from transport failure. Models do not repair transport.
+
+Canvas chooses timeout quarantine, runtime recapture, and coordinator notifications. These are Profile choices, not mandatory Core error controls. Late old content cannot replace delivered state, and incomplete observations cannot masquerade as complete feedback. Information cadence follows interaction demand: 10 Hz means 100 ms windows. Finer root ticks and internal retries do not raise the model information rate or permit a second frame in an occupied period.

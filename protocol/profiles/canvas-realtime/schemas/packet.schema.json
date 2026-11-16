@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "binding_id": {
+      "const": "canvas.a2rt.mock.v2"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "epoch": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "packet_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sent_root_tick": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sync_group_id": {
+      "enum": [
+        "canvas_interaction",
+        "system_notifications"
+      ]
+    },
+    "frame_seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "root_window": {
+      "type": "object",
+      "properties": {
+        "start_tick": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_tick": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "start_tick",
+        "end_tick"
+      ],
+      "additionalProperties": false
+    },
+    "data_frames": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "track_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "payload": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "track_id",
+              "source_id",
+              "payload"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "track_id": {
+                "enum": [
+                  "assistant.audio",
+                  "user.audio"
+                ]
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "audio": {
+                "type": "object"
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "length": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "offset",
+                  "length"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "track_id",
+              "source_id",
+              "audio",
+              "body"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "binding_id",
+    "session_id",
+    "epoch",
+    "packet_id",
+    "sent_root_tick",
+    "sync_group_id",
+    "frame_seq",
+    "root_window",
+    "data_frames"
+  ],
+  "additionalProperties": false
+}

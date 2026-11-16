@@ -35,4 +35,10 @@ python scripts/check_site.py
 npm test --prefix worker
 ```
 
-These checks cover documentation provenance, illustrative configuration structure and arithmetic, bilingual website links, and the current AI index/retrieval behavior. They do not validate an unreleased new runtime. Runtime conformance, content handling, and latency targets require separate validation.
+These checks cover documentation provenance, illustrative configuration structure and arithmetic, bilingual website links, and the current AI index/retrieval behavior. They do not execute the Canvas mock or certify a general runtime. Runtime conformance, content handling, and latency targets require separate validation.
+
+## Current Canvas Realtime configuration
+
+[Canvas Realtime](profiles/canvas-realtime/index.md) provides a concrete [Profile]({{ base }}protocol/profiles/canvas-realtime/profile.json) and [session]({{ base }}protocol/profiles/canvas-realtime/session.json). It has a 1,000 Hz root, 10 Hz interaction, independent 100 Hz notifications, and seven protocol tracks. These settings are separate from the general illustration above.
+
+Actual 24 kHz mono L16 audio has 2,400 samples / 4,800 bytes per 100 ms. Senders prepare observations, ingress validates them, and runtime recaptures after timeout in a legal new period. See [interaction](profiles/canvas-realtime/interaction.md) and [binary Binding](profiles/canvas-realtime/binary-binding.md). These local Profile choices do not impose Core error notifications or recovery flows.

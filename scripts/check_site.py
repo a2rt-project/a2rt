@@ -75,12 +75,13 @@ for artifact in index_root.glob("*.json"):
         errors.append(f"Public and Worker indexes differ: {artifact.name}")
 
 expected_specs = {f"spec/{path.stem}.html" for path in (ROOT / "protocol").glob("0[1-4]-*.md")}
+expected_profiles = {"profiles/canvas.html", *{f"profiles/canvas-realtime/{page}.html" for page in ("index", "interaction", "binary-binding")}}
 for name in ("zh", "en"):
     chunks = json.loads((DIST / f"docs/ai-index/chunks_{name}.json").read_text())
     if not chunks or any(len(item.get("embedding", [])) != 384 for item in chunks):
         errors.append(f"Invalid {name} search index")
     indexed = {item["source_path"] for item in chunks}
-    if {path for path in indexed if path.startswith("spec/")} != expected_specs or "profiles/canvas.html" not in indexed:
+    if {path for path in indexed if path.startswith("spec/")} != expected_specs or not expected_profiles <= indexed:
         errors.append(f"{name} index does not match the current architecture chapters")
     for chunk in chunks:
         citation = urlsplit(chunk["docs_url"])

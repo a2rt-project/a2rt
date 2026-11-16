@@ -65,3 +65,23 @@ A receiver’s contiguous delivery position, not latest arrival or proof of cons
 ## Profile
 
 Defines domain content, output/task boundaries, presentation, recovery, completeness, and validation.
+
+## Sender responsibility
+
+In both directions, the sender prepares, aligns, and validates consumable information and owns send-side recovery. Receivers still reassemble, deduplicate, decode, and validate without guessing business meaning.
+
+## Model admission
+
+Network arrival does not imply readiness for model consumption. Ingress admits information under the Profile; the model reasons and produces business output rather than assembling packets or retrying transport.
+
+## Exception policy
+
+Profiles choose silent discard, notification, recovery, or termination. Core does not mandate error messages, per-frame ACKs, retransmission requests, or a dedicated error track. Discard cannot fabricate success or completeness.
+
+## Binding
+
+Maps the contract to serialization, envelopes, source binding, transport/reassembly, pacing, capacity, and queue limits. Senders, receivers, adapters, and runtimes are executing participants, distinct from normative layers.
+
+## ModelIngress / RecoveryRuntime
+
+Canvas Realtime local-mock components for ingress validation and environment-side recovery. The former validates packets and quarantines expired observations; the latter recaptures in legal periods. Neither is a model-generated business event.
