@@ -1,0 +1,507 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cutoff_root_tick": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "value": {
+      "type": "object",
+      "properties": {
+        "executor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot_seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "board_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "persisted_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pending_mutation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "participants": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "properties": {
+              "actor": {
+                "enum": [
+                  "assistant",
+                  "user"
+                ]
+              },
+              "tool": {
+                "enum": [
+                  "selection",
+                  "ellipse",
+                  "freedraw",
+                  "eraser"
+                ]
+              },
+              "style": {
+                "type": "object"
+              },
+              "pointer": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  },
+                  "buttons": {
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "captured": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "buttons",
+                  "captured"
+                ],
+                "additionalProperties": false
+              },
+              "selection": {
+                "type": "object",
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "status": {
+                    "enum": [
+                      "ready",
+                      "updating"
+                    ]
+                  },
+                  "element_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "group_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "editing_group_id": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "bounds": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "x": {
+                            "type": "number"
+                          },
+                          "y": {
+                            "type": "number"
+                          },
+                          "width": {
+                            "type": "number"
+                          },
+                          "height": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "x",
+                          "y",
+                          "width",
+                          "height"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "revision",
+                  "status",
+                  "element_ids",
+                  "group_ids",
+                  "editing_group_id",
+                  "bounds"
+                ],
+                "additionalProperties": false
+              },
+              "active_task_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "interaction": {
+                "type": "string",
+                "minLength": 1
+              },
+              "marquee": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  },
+                  "width": {
+                    "type": "number"
+                  },
+                  "height": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y",
+                  "width",
+                  "height"
+                ],
+                "additionalProperties": false
+              },
+              "pending_erasure_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "actor",
+              "tool",
+              "style",
+              "pointer",
+              "selection",
+              "active_task_id",
+              "interaction"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "type",
+              "x",
+              "y",
+              "width",
+              "height",
+              "isDeleted",
+              "groupIds"
+            ]
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "element_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "id",
+              "element_ids"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "view": {
+          "type": "object"
+        },
+        "tool_availability": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "task_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actor_id": {
+                "enum": [
+                  "assistant",
+                  "user"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "active",
+                  "completed",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "task_id",
+              "actor_id",
+              "status",
+              "revision"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "executor_id",
+        "snapshot_seq",
+        "board_revision",
+        "persisted_revision",
+        "pending_mutation_ids",
+        "participants",
+        "objects",
+        "groups",
+        "view",
+        "tool_availability",
+        "operations"
+      ],
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "enum": [
+              "applied",
+              "completed",
+              "rejected",
+              "cancelled"
+            ]
+          },
+          "task_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "active",
+                  "completed",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "time": {
+            "type": "object",
+            "properties": {
+              "clock_id": {
+                "const": "root"
+              },
+              "tick": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "clock_id",
+              "tick"
+            ],
+            "additionalProperties": false
+          },
+          "result": {
+            "type": "object"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "event_id",
+          "task_id",
+          "revision",
+          "status",
+          "task_status",
+          "time",
+          "result",
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "playback": {
+      "type": "object",
+      "properties": {
+        "track_id": {
+          "const": "assistant.audio"
+        },
+        "played_sample": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "buffered_until_sample": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "state": {
+          "enum": [
+            "paused",
+            "playing",
+            "underrun",
+            "stopped"
+          ]
+        }
+      },
+      "required": [
+        "track_id",
+        "played_sample",
+        "buffered_until_sample",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "user_event_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sync_group_id": {
+            "const": "canvas_interaction"
+          },
+          "frame_seq": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "track_id": {
+            "const": "user.events"
+          },
+          "event_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "sync_group_id",
+          "frame_seq",
+          "track_id",
+          "event_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "revision",
+    "cutoff_root_tick",
+    "value",
+    "results",
+    "playback",
+    "user_event_refs"
+  ],
+  "additionalProperties": false
+}

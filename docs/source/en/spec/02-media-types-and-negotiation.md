@@ -77,3 +77,9 @@ Image dimensions, audio encoding, content-schema compliance, and business validi
 At ten images per second, actual 1 MB images alone require 10 MB/s before other tracks and A2RT overhead. The illustrative group's 64 units of 1,024 bytes do not fit a near-1 MB image. Supporting a format maximum does not automatically reserve that capacity; either cover the maximum or define verifiable traffic restrictions.
 
 Received, validated, delivered, consumed, and presented are different facts. Content failures retain their frame/track associations and follow Profile rules. Common time, configuration identity, and history are not rewritten by a format declaration. See [responsibilities](03-core-profile-responsibilities.md) for the full boundary.
+
+## Before model consumption
+
+Senders prepare information and validate it before transmission; receiver ingress performs required reassembly, decoding, and validation before model admission. An interface may natively accept agreed encoded media or streaming segments. It must not require the model to parse transport fragments, repair damaged content, or align tracks. Profile-permitted partial content and valid business failures retain their declared semantics.
+
+A Profile decides whether a format failure is silently discarded or reported, and by which mechanism. Core references locate affected tracks and frames; they do not require an error message, ACK, or recovery request. Internal format-processing failures are handled by runtime under the [responsibility contract](03-core-profile-responsibilities.md).

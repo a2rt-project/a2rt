@@ -1,0 +1,230 @@
+{
+  "binding_id": "canvas.a2rt.mock.v2",
+  "session_id": "canvas_realtime_demo",
+  "epoch": 1,
+  "profile_id": "canvas.excalidraw.realtime",
+  "clocks": [
+    {
+      "clock_id": "root",
+      "frequency_hz": 1000,
+      "origin": "session_start",
+      "standard_frame_bytes": 1024,
+      "size_scope": "a2rt_frame",
+      "standard_frames_per_tick": 256
+    },
+    {
+      "clock_id": "interaction",
+      "parent_clock_id": "root",
+      "period_parent_ticks": 100,
+      "offset_parent_ticks": 0
+    },
+    {
+      "clock_id": "notifications",
+      "parent_clock_id": "root",
+      "period_parent_ticks": 10,
+      "offset_parent_ticks": 0
+    }
+  ],
+  "sync_groups": [
+    {
+      "sync_group_id": "canvas_interaction",
+      "clock_id": "interaction",
+      "start_tick": 0,
+      "delivery_policy": {
+        "max_wait_root_ticks": 300,
+        "max_skew_root_ticks": 0,
+        "on_timeout": "runtime_resync_once_then_suspend"
+      },
+      "limits": {
+        "max_frame_units": 256,
+        "receiver_queues": [
+          {
+            "receiver_id": "model",
+            "max_pending_frames": 64
+          },
+          {
+            "receiver_id": "environment",
+            "max_pending_frames": 4
+          }
+        ]
+      }
+    },
+    {
+      "sync_group_id": "system_notifications",
+      "clock_id": "notifications",
+      "start_tick": 0,
+      "delivery_policy": {
+        "max_wait_root_ticks": 0,
+        "max_skew_root_ticks": 0,
+        "on_timeout": "suspend"
+      },
+      "limits": {
+        "max_frame_units": 4,
+        "receiver_queues": [
+          {
+            "receiver_id": "model",
+            "max_pending_frames": 64
+          }
+        ]
+      }
+    }
+  ],
+  "formats": [
+    {
+      "format_id": "event",
+      "media_type": "application/json",
+      "constraints": {
+        "schema_ref": "./schemas/event.schema.json",
+        "max_encoded_bytes": 131072
+      }
+    },
+    {
+      "format_id": "audio",
+      "media_type": "audio/L16",
+      "constraints": {
+        "rate": 24000,
+        "channels": 1,
+        "max_encoded_bytes": 131072
+      }
+    },
+    {
+      "format_id": "visual",
+      "media_type": "application/json",
+      "constraints": {
+        "schema_ref": "./schemas/visual.schema.json",
+        "max_encoded_bytes": 131072
+      }
+    },
+    {
+      "format_id": "state",
+      "media_type": "application/json",
+      "constraints": {
+        "schema_ref": "./schemas/state.schema.json",
+        "max_encoded_bytes": 131072
+      }
+    },
+    {
+      "format_id": "system",
+      "media_type": "application/json",
+      "constraints": {
+        "schema_ref": "./schemas/system.schema.json",
+        "max_encoded_bytes": 131072
+      }
+    }
+  ],
+  "tracks": [
+    {
+      "track_id": "assistant.audio",
+      "role": "assistant",
+      "direction": "output",
+      "sync_group_id": "canvas_interaction",
+      "format_id": "audio",
+      "source_binding": {
+        "source_ids": [
+          "model"
+        ]
+      },
+      "content_policy": {
+        "decoder": "audio",
+        "missing": "absent_until_profile_required"
+      }
+    },
+    {
+      "track_id": "assistant.events",
+      "role": "assistant",
+      "direction": "output",
+      "sync_group_id": "canvas_interaction",
+      "format_id": "event",
+      "source_binding": {
+        "source_ids": [
+          "model"
+        ]
+      },
+      "content_policy": {
+        "decoder": "event",
+        "missing": "absent_until_profile_required"
+      }
+    },
+    {
+      "track_id": "user.audio",
+      "role": "user",
+      "direction": "input",
+      "sync_group_id": "canvas_interaction",
+      "format_id": "audio",
+      "source_binding": {
+        "source_ids": [
+          "user_mic"
+        ]
+      },
+      "content_policy": {
+        "decoder": "audio",
+        "missing": "absent_until_profile_required"
+      }
+    },
+    {
+      "track_id": "user.events",
+      "role": "user",
+      "direction": "input",
+      "sync_group_id": "canvas_interaction",
+      "format_id": "event",
+      "source_binding": {
+        "source_ids": [
+          "user_input"
+        ]
+      },
+      "content_policy": {
+        "decoder": "event",
+        "missing": "absent_until_profile_required"
+      }
+    },
+    {
+      "track_id": "environment.visual",
+      "role": "environment",
+      "direction": "input",
+      "sync_group_id": "canvas_interaction",
+      "format_id": "visual",
+      "source_binding": {
+        "source_ids": [
+          "executor"
+        ]
+      },
+      "content_policy": {
+        "decoder": "visual",
+        "missing": "absent_until_profile_required"
+      }
+    },
+    {
+      "track_id": "environment.state",
+      "role": "environment",
+      "direction": "input",
+      "sync_group_id": "canvas_interaction",
+      "format_id": "state",
+      "source_binding": {
+        "source_ids": [
+          "executor"
+        ]
+      },
+      "content_policy": {
+        "decoder": "state",
+        "missing": "absent_until_profile_required"
+      }
+    },
+    {
+      "track_id": "system",
+      "role": "system",
+      "direction": "input",
+      "sync_group_id": "system_notifications",
+      "format_id": "system",
+      "source_binding": {
+        "source_ids": [
+          "coordinator"
+        ]
+      },
+      "content_policy": {
+        "decoder": "system",
+        "missing": "absent_until_profile_required"
+      }
+    }
+  ],
+  "profile_version": "0.3.0-draft"
+}

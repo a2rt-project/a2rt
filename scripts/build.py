@@ -6,6 +6,7 @@ import hashlib
 import html
 import json
 import os
+import posixpath
 from pathlib import Path
 import re
 import shutil
@@ -50,22 +51,40 @@ def prepare_docs(cfg):
     shutil.copytree(ROOT / "docs/source", source, dirs_exist_ok=True)
     for page in source.rglob("*.md"):
         page.write_text(page.read_text().replace("{{ base }}", cfg["base_path"]))
-    # Generate the Chinese specification directly from its authoritative files.
-    specs = source / "zh/spec"
-    specs.mkdir(parents=True, exist_ok=True)
-    for original in sorted((ROOT / "protocol").glob("0[1-4]-*.md")):
-        body = original.read_text().replace("(./profiles/canvas/README.md)", "(../profiles/canvas.md)")
+    # Keep the overview, Core chapters, and current Profiles tied to one snapshot.
+    pages = {"README.md": "overview.md", "profiles/canvas/README.md": "profiles/canvas.md"}
+    pages.update({p.name: f"spec/{p.name}" for p in (ROOT / "protocol").glob("0[1-4]-*.md")})
+    pages.update({f"profiles/canvas-realtime/{name}": f"profiles/canvas-realtime/{target}" for name, target in (
+        ("README.md", "index.md"), ("01-interaction-and-delivery.md", "interaction.md"),
+        ("02-binary-binding.md", "binary-binding.md"))})
+    for original, destination in pages.items():
+        def source_link(match):
+            label, href = match.groups()
+            if urlparse(href).scheme or href.startswith(("#", "/")):
+                return match[0]
+            path, separator, fragment = href.partition("#")
+            resolved = posixpath.normpath(posixpath.join(posixpath.dirname(original), path))
+            if resolved in pages:
+                target = posixpath.relpath(pages[resolved], posixpath.dirname(destination) or ".")
+            else:
+                if not (ROOT / "protocol" / resolved).is_file():
+                    raise ValueError(f"Missing protocol link: {original}: {href}")
+                target = cfg["base_path"] + "protocol/" + resolved
+            return f"[{label}]({target}{separator}{fragment})"
+
+        body = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", source_link, (ROOT / "protocol" / original).read_text())
+        if original == "README.md":
+            body = re.sub(r"^# .*", "# 协议概览", body, count=1)
+        if original == "profiles/canvas-realtime/README.md":
+            body += "\n```{toctree}\n:maxdepth: 1\n\ninteraction\nbinary-binding\n```\n"
         # CommonMark needs separation after punctuation-ending emphasis before
         # adjacent CJK prose. Adapt rendering without modifying the source copy.
         body = re.sub(r"([）”])\*\*(?=[\u4e00-\u9fff])", r"\1** ", body)
         # Render the source's small architecture diagram without a JS/CDN dependency.
         body = re.sub(r"```mermaid\n.*?```", f'<img src="{cfg["base_path"]}assets/clock-groups.svg" alt="根时钟、子时钟、独立同步组及其轨道">', body, flags=re.S)
-        (specs / original.name).write_text(body)
-    profile = source / "zh/profiles/canvas.md"
-    profile.parent.mkdir(parents=True, exist_ok=True)
-    body = (ROOT / "protocol/profiles/canvas/README.md").read_text()
-    body = body.replace("(../../README.md)", "(../overview.md)")
-    profile.write_text(body)
+        target = source / "zh" / destination
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(body)
     for page in source.rglob("*.md"):
         body = re.sub(r"\[([^\]]+)\]\((/[^)]+)\)", lambda m: '<a href="' + html.escape(m[2], quote=True) + '">' + html.escape(m[1]) + '</a>', page.read_text())
         body = re.sub(r'<img src="[^"]*/assets/clock-groups.svg"([^>]*)>',

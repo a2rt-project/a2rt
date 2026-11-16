@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "mode": {
+      "enum": [
+        "data",
+        "empty"
+      ]
+    },
+    "start_sample": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sample_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "clock_id": {
+          "const": "root"
+        },
+        "start_root_tick": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_root_tick": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "clock_id",
+        "start_root_tick",
+        "end_root_tick"
+      ],
+      "additionalProperties": false
+    },
+    "requires_events": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "mode",
+    "start_sample",
+    "sample_count",
+    "coverage",
+    "requires_events"
+  ],
+  "additionalProperties": false
+}

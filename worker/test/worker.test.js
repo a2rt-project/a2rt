@@ -164,12 +164,18 @@ test('health identifies the current architecture without claiming a wire release
   assert.equal(body.revision, '2026-11-16');
 });
 
-test('bilingual retrieval finds current single-frame and system-group rules', async () => {
+test('bilingual retrieval finds Core invariants, delivery responsibilities, and current Canvas contracts', async () => {
   for (const [language, question, expectedSource, evidence] of [
     ['zh', 'system 轨道必须独立成组吗？', '04-system-track-and-lifecycle', /同组|同一.*组|独立.*组/],
     ['zh', '每轨每周期最多一个数据帧是什么意思？', '01-clock-sync-group-track-model', /每条轨道每个周期最多只能有一个数据帧/],
     ['en', 'Can both directions publish a data frame in the same period on a bidirectional track?', '01-clock-sync-group-track-model', /only one data frame|at most one data frame/],
     ['en', 'What are Core and Profile responsibilities?', '03-core-profile-responsibilities', /Profile Content events and schemas/],
+    ['zh', 'Core 是否强制错误控制消息、逐帧 ACK 或专用错误轨道？', 'spec/', /不强制错误控制消息/],
+    ['en', 'Does Core mandate error control messages or per-frame ACKs?', '03-core-profile-responsibilities', /Core does not mandate error control messages/],
+    ['zh', '谁发送谁负责，模型需要拼包或重传吗？', '03-core-profile-responsibilities', /发送端|模型/],
+    ['en', 'Who owns information preparation and send-side recovery in both directions?', '03-core-profile-responsibilities', /sender.*responsib|send-side recovery/i],
+    ['zh', 'Canvas Realtime 交互信息时钟是 10Hz 吗？', 'profiles/canvas-realtime', /10Hz/],
+    ['en', 'Canvas binary audio Binding: what is the L16 byte order and sample rate?', 'profiles/canvas-realtime/binary-binding', /big-endian/],
   ]) {
     const chunks = JSON.parse(await readFile(new URL(`../assets/index/chunks_${language}.json`, import.meta.url)));
     const results = (await rank(question, chunks)).slice(0, 3);
