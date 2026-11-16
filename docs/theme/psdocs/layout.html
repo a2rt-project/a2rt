@@ -7,6 +7,7 @@
   <meta name="a2rt-ai-endpoint" content="{{ a2rt_ai_endpoint|e }}">
   <meta name="a2rt-turnstile-site-key" content="{{ a2rt_turnstile_site_key|e }}">
   <meta name="a2rt-source" content="{{ pathto('_sources/' ~ pagename ~ '.md.txt', 1) }}">
+  <meta name="theme-color" content="#f8fafd">
   <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
   {{ metatags }}
 
@@ -23,22 +24,13 @@
     <link rel="icon" href="{{ favicon_url }}?v={{ asset_version }}">
   {%- endif %}
 
+  <link rel="stylesheet" href="{{ a2rt_base }}assets/shell.css?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ a2rt_base }}assets/search.css?v={{ asset_version }}">
   {%- block extrahead %}{%- endblock %}
 
-  {#- Restore banner-dismissed state before paint #}
-  <script>
-    (function () {
-      try {
-        if (localStorage.getItem('ps-banner-dismissed') === '1') {
-          document.documentElement.dataset.bannerHidden = '1';
-        }
-      } catch (e) {}
-    })();
-  </script>
 </head>
 <body>
   <a class="a2rt-skip" href="#main">{{ "跳到内容" if ps_current_language.code == "zh" else "Skip to content" }}</a>
-  {% include "partials/banner.html" %}
   {% include "partials/header.html" %}
 
   <div class="ps-layout">
@@ -68,5 +60,7 @@
       {%- endif %}
     {%- endfor %}
   {%- endblock %}
+  <script src="{{ a2rt_base }}assets/shell.js?v={{ asset_version }}"></script>
+  <script src="{{ a2rt_base }}assets/search.js?v={{ asset_version }}"></script>
 </body>
 </html>

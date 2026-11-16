@@ -29,7 +29,10 @@ site/                    明亮风格官网、中英文内容和同步组示意
 site.config.json         公开站点配置、草案状态和文档修订日期
 docs/source/zh/          中文概览、接入设计、示例、术语与状态
 docs/source/en/          英文导读，覆盖相同的当前架构
-docs/theme/psdocs/       文档主题和搜索界面
+site/partials/          官网与 Docs 共用的导航和搜索弹窗
+site/assets/shell.*     共用导航样式与交互
+site/assets/search.*    共用搜索与 AI 问答样式和交互
+docs/theme/psdocs/       文档正文、侧栏与目录主题
 worker/                  Cloudflare Worker 文档检索与问答
 scripts/                 构建、配置示意检查、索引与站内检查
 .github/workflows/       main 自动部署、PR 构建检查
@@ -66,7 +69,7 @@ AI 索引从当前构建的 Docs 生成。`dist/docs/ai-index/` 与 `worker/asse
 
 ## 品牌资源
 
-`/brand/` 展示当前九宫格与四角星标志。官网使用 `site/assets/logo-symbol.svg`，文档使用 `docs/static/logo-symbol.svg`，两处保持一致。`favicon.svg` 使用适合小尺寸的描边。资源使用矢量图形，背景透明。
+`/brand/` 展示当前九宫格与四角星标志。官网与 Docs 的共用导航统一使用 `site/assets/logo-symbol.svg`。`favicon.svg` 使用适合小尺寸的描边。资源使用矢量图形，背景透明。
 
 ## 文档主题来源
 

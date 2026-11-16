@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import json
 import hashlib
+import sys
 from datetime import datetime
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -29,78 +30,10 @@ _LANGUAGE_LABELS = {
     "zh": {"label": "中文", "html_lang": "zh-CN", "sphinx_language": "zh_CN"},
     "en": {"label": "English", "html_lang": "en", "sphinx_language": "en"},
 }
-_UI_TEXT = {
-    "zh": {
-        "breadcrumb": "面包屑",
-        "copy_markdown": "Copy Markdown",
-        "documentation_source": "文档源码",
-        "home": "首页",
-        "in_this_article": "本文目录",
-        "language": "语言",
-        "language_menu": "选择语言",
-        "next": "下一篇",
-        "open_sidebar": "打开侧栏",
-        "page_toc": "本页目录",
-        "prev_next": "上一/下一篇",
-        "previous": "上一篇",
-        "ai_search": "AI 搜索",
-        "ai_search_empty": "请先输入要查询的问题。",
-        "ai_search_error": "AI 搜索服务暂不可用，请稍后重试。",
-        "ai_search_loading": "正在根据文档生成回答...",
-        "ai_search_verifying": "请完成安全验证，验证后将开始生成回答。",
-        "ai_search_no_sources": "未在当前文档中找到可靠来源。",
-        "ai_search_retention_notice": "回答由 AI 根据文档生成，请核对引用来源。问题会发送给配置的模型服务。",
-        "ai_search_sources": "参考来源",
-        "ai_label": "AI",
-        "ask_ai": "Ask AI",
-        "close_search": "关闭搜索",
-        "search_or_ask": "Search or ask",
-        "search_or_ask_ai": "Search or ask AI",
-        "search_docs": "搜索文档",
-        "search_placeholder": "Search",
-        "sidebar": "侧栏导航",
-    },
-    "en": {
-        "breadcrumb": "Breadcrumb",
-        "copy_markdown": "Copy Markdown",
-        "documentation_source": "Documentation source",
-        "home": "Home",
-        "in_this_article": "In this article",
-        "language": "Language",
-        "language_menu": "Select language",
-        "next": "Next",
-        "open_sidebar": "Open sidebar",
-        "page_toc": "Page contents",
-        "prev_next": "Previous/next article",
-        "previous": "Previous",
-        "ai_search": "AI Search",
-        "ai_search_empty": "Enter a question first.",
-        "ai_search_error": "AI Search is unavailable. Try again later.",
-        "ai_search_loading": "Generating an answer from the docs...",
-        "ai_search_verifying": "Complete the security check to start generating your answer.",
-        "ai_search_no_sources": "No reliable source was found in the current docs.",
-        "ai_search_retention_notice": "AI answers may be inaccurate. Check cited documentation. Questions are sent to the configured model provider.",
-        "ai_search_sources": "Sources",
-        "ai_label": "AI",
-        "ask_ai": "Ask AI",
-        "close_search": "Close search",
-        "search_or_ask": "Search or ask",
-        "search_or_ask_ai": "Search or ask AI",
-        "search_docs": "Search docs",
-        "search_placeholder": "Search",
-        "sidebar": "Sidebar navigation",
-    },
-}
-_SEARCH_EXAMPLES = {
-    "zh": ["根时钟与同步组是什么关系？", "每轨每周期最多一个数据帧是什么意思？", "system 轨道必须独立成组吗？", "Core 与 Profile 各负责什么？"],
-    "en": ["How do root clocks and sync groups relate?", "What does one data frame per track per period mean?", "Must the system track have its own group?", "What do Core and Profiles each define?"],
-}
+_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_ROOT / "scripts"))
+from site_ui import shell_context
 _CONFIG = json.loads(os.environ["A2RT_SITE_CONFIG"])
-_AI_ENABLED = bool(_CONFIG["ai_endpoint"] and _CONFIG["turnstile_site_key"])
-if not _AI_ENABLED:
-    _SEARCH_EXAMPLES = {"zh": ["根时钟", "同步组", "system", "media_type"], "en": ["root clock", "sync groups", "system", "media_type"]}
-    for code, label in [("zh", "搜索文档"), ("en", "Search docs")]:
-        _UI_TEXT[code].update(search_or_ask=label, search_or_ask_ai=label, ai_label="", ask_ai=label)
 
 
 
@@ -159,6 +92,7 @@ def _build_toc_intro_context(context: dict[str, object]) -> None:
 
 def setup(app):
     app.connect("html-page-context", lambda app, pagename, templatename, context, doctree: _build_toc_intro_context(context))
+    app.connect("html-page-context", lambda app, pagename, templatename, context, doctree: context.update(shell_context(_CONFIG, _LANGUAGE_CODE, pagename)))
     return {
         "parallel_read_safe": True,
         "parallel_write_safe": True,
@@ -172,7 +106,7 @@ extensions = [
     "sphinx_design",
 ]
 
-templates_path = []
+templates_path = [str(_ROOT / "site")]
 exclude_patterns = ["Thumbs.db", ".DS_Store"]
 locale_dirs = []
 gettext_compact = True
@@ -201,7 +135,7 @@ html_show_search_summary = False
 _BREADCRUMB_SECTIONS = {"zh": {}, "en": {}}
 # Keep cached theme assets until their content changes, including local previews.
 _ASSET_HASH = hashlib.sha256()
-for _asset_root in (_THEME_DIR / "psdocs/static", Path(__file__).parent / "static"):
+for _asset_root in (_THEME_DIR / "psdocs/static", Path(__file__).parent / "static", _ROOT / "site/assets"):
     for _asset in sorted(_asset_root.rglob("*")):
         if _asset.is_file():
             _ASSET_HASH.update(_asset.relative_to(_asset_root).as_posix().encode() + b"\0")
@@ -210,7 +144,6 @@ html_context = {
     "asset_version": _ASSET_HASH.hexdigest()[:16],
     "a2rt_base": _CONFIG["base_path"],
     "a2rt_home": _CONFIG["base_path"] + ("en/" if _LANGUAGE_CODE == "en" else ""),
-    "a2rt_ai_enabled": _AI_ENABLED,
     "a2rt_ai_endpoint": _CONFIG["ai_endpoint"],
     "a2rt_turnstile_site_key": _CONFIG["turnstile_site_key"],
     "breadcrumb_sections": _BREADCRUMB_SECTIONS[_LANGUAGE_CODE],
@@ -219,8 +152,6 @@ html_context = {
         _LANGUAGE_LABELS["zh"] | {"code": "zh"},
         _LANGUAGE_LABELS["en"] | {"code": "en"},
     ],
-    "ps_search_examples": _SEARCH_EXAMPLES[_LANGUAGE_CODE],
-    "ps_ui": _UI_TEXT[_LANGUAGE_CODE],
 }
 
 # psdocs ships app.js under its static/; theme.conf already declares stylesheets.

@@ -16,7 +16,7 @@
     "explore": "探索同步组",
     "hero_note": "统一时间 · 按组同步 · Profile 定义语义",
     "console_label": "根时钟与独立信息同步组的配置示意",
-    "illustration": "配置示意",
+    "illustration": "时钟与同步组",
     "console_caption": "取自规范配置示例 · 数值用于说明关系，不代表性能或时延保证",
     "strip_one": "一个根时钟",
     "strip_two": "独立同步组 · 自定义轨道",
@@ -139,7 +139,7 @@
     "back_top": "回到顶部",
     "select_group": "选择信息同步组",
     "root_capacity": "1,024 B / 标准单位 · 1 单位 / 根刻度",
-    "window_label": "窗口 / root ticks",
+    "window_label": "根刻度",
     "group_budget": "组容量 / 窗口",
     "queue_label": "接收队列上限",
     "unit_label": "单位",
@@ -214,7 +214,14 @@
         ],
         "description": "示例将唯一的 system 输入轨道放在独立组。其他 Profile 可以选择同组；实际中断与清理不等待通知交付。"
       }
-    ]
+    ],
+    "rhythm_title": "共享时间，各自前行",
+    "play_motion": "播放动画",
+    "pause_motion": "暂停动画",
+    "motion_caption": "慢速节拍示意 · 窗口不代表数据必定到齐或完成",
+    "ticks_window": "刻度 / 窗口",
+    "tracks_label": "条轨道",
+    "track_label": "条轨道"
   },
   "en": {
     "title": "A2RT — Agent-to-Real-Time Protocol",
@@ -233,7 +240,7 @@
     "explore": "Explore sync groups",
     "hero_note": "Shared time · Grouped delivery · Profile semantics",
     "console_label": "Configuration illustration of a root clock and independent synchronization groups",
-    "illustration": "ILLUSTRATION",
+    "illustration": "Clocks & sync groups",
     "console_caption": "From the draft configuration · Illustrative values, not latency or performance guarantees",
     "strip_one": "ONE ROOT CLOCK",
     "strip_two": "INDEPENDENT GROUPS · CONFIGURABLE TRACKS",
@@ -356,7 +363,7 @@
     "back_top": "Back to top",
     "select_group": "Select a synchronization group",
     "root_capacity": "1,024 B / standard unit · 1 unit / root tick",
-    "window_label": "WINDOW / ROOT TICKS",
+    "window_label": "Root ticks",
     "group_budget": "Group budget / window",
     "queue_label": "Receiver queue limit",
     "unit_label": "units",
@@ -431,6 +438,13 @@
         ],
         "description": "This example places the unique system input track in a separate group. Other Profiles may share a group; actual interruption and cleanup do not wait for notification delivery."
       }
-    ]
+    ],
+    "rhythm_title": "One clock. Independent rhythms.",
+    "play_motion": "Play motion",
+    "pause_motion": "Pause motion",
+    "motion_caption": "Slowed timing illustration · Windows do not guarantee arrival or completion",
+    "ticks_window": "ticks / window",
+    "tracks_label": "tracks",
+    "track_label": "track"
   }
 }

@@ -1,0 +1,22 @@
+{# One global header, rendered by both the landing-page builder and Sphinx. #}
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-brand" href="{{ site_nav.home }}" aria-label="A2RT {{ ps_ui.home }}"><img src="{{ site_nav.base }}assets/logo-symbol.svg?v={{ asset_version }}" width="28" height="28" alt=""><span translate="no">A2RT</span><span class="site-brand__version">Draft</span></a>
+    <span class="site-header__divider" aria-hidden="true">/</span>
+    <nav class="site-nav" id="site-navigation" aria-label="{{ site_nav.label }}">
+      <a href="{{ site_nav.docs }}" {% if site_nav.is_docs %}aria-current="true"{% endif %}>Docs</a>
+      <a href="{{ site_nav.home }}#protocol">{{ site_nav.protocol }}</a>
+      <a href="{{ site_nav.home }}#architecture">{{ site_nav.architecture }}</a>
+    </nav>
+    <div class="site-header__utilities">
+      <form class="site-search" action="{{ search_action }}" method="get" role="search" autocomplete="off" data-ps-search>
+        <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.5"/></svg>
+        <input class="ps-search__input" type="search" name="q" aria-label="{{ site_nav.search }}" placeholder="{{ site_nav.search }}" autocomplete="off" readonly>
+        <kbd aria-hidden="true"><span data-shortcut-modifier>⌘</span> K</kbd>
+      </form>
+      <a class="site-icon" href="{{ site_nav.repo }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub · a2rt-project/a2rt" title="GitHub"><img src="{{ site_nav.base }}assets/github.svg" width="20" height="20" alt=""></a>
+      <a class="site-language site-icon" href="{{ site_nav.alternate }}" lang="{{ 'en' if site_nav.other == 'en' else 'zh-CN' }}" hreflang="{{ site_nav.other }}" aria-label="{{ site_nav.language_label }}" title="{{ site_nav.language_label }}">{{ 'EN' if site_nav.other == 'en' else '中' }}</a>
+      <button class="site-menu site-icon" type="button" aria-label="{{ site_nav.menu }}" aria-controls="site-navigation" aria-expanded="false" data-site-menu><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 14h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+</header>
