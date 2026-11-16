@@ -1,6 +1,6 @@
 {# psdocs · layout.html — overall HTML skeleton #}
 <!DOCTYPE html>
-<html lang="{{ ps_current_language.html_lang|default('zh-CN') }}">
+<html lang="{{ ps_current_language.html_lang|default('en') }}" data-site-base="{{ a2rt_base }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -10,6 +10,7 @@
   <meta name="theme-color" content="#f8fafd">
   <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
   {{ metatags }}
+  {% include "partials/language-meta.html" %}
 
   {#- Stylesheets registered via theme.conf + html_css_files #}
   {%- for css in css_files %}

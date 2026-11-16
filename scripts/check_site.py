@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DIST = ROOT / "dist"
 BASE = "/" + os.environ.get("SITE_BASE_PATH", json.loads((ROOT / "site.config.json").read_text())["base_path"]).strip("/")
 BASE = BASE.rstrip("/") + "/"
+ORIGIN = os.environ.get("SITE_ORIGIN", json.loads((ROOT / "site.config.json").read_text())["origin"]).rstrip("/")
 
 
 class Page(HTMLParser):
@@ -18,10 +19,22 @@ class Page(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.refs = []
         self.ids = set()
+        self.base_url = ""
+        self.html = {}
+        self.canonical = None
+        self.alternates = {}
         self.feed(path.read_text())
 
     def handle_starttag(self, tag, attributes):
         attrs = dict(attributes)
+        if tag == "html":
+            self.html = attrs
+        if tag == "base":
+            self.base_url = attrs.get("href", "")
+        if tag == "link" and attrs.get("rel") == "canonical":
+            self.canonical = attrs.get("href")
+        if tag == "link" and attrs.get("rel") == "alternate":
+            self.alternates[attrs.get("hreflang")] = attrs.get("href")
         if attrs.get("id"):
             self.ids.add(attrs["id"])
         if tag in ("a", "link") and attrs.get("href"):
@@ -39,6 +52,7 @@ errors = []
 references = 0
 for path, page in pages.items():
     current = "https://local.invalid" + BASE + path.relative_to(DIST).as_posix()
+    current = urljoin(current, page.base_url)
     for raw in page.refs:
         url = urlsplit(urljoin(current, raw))
         if url.netloc != "local.invalid" or url.scheme not in ("http", "https"):
@@ -54,6 +68,36 @@ for path, page in pages.items():
             errors.append(f"{path.relative_to(DIST)}: missing {raw}")
         elif url.fragment and target in pages and unquote(url.fragment) not in pages[target].ids:
             errors.append(f"{path.relative_to(DIST)}: missing fragment {raw}")
+
+# Verify the actual static output crawlers receive, including the no-JS docs entry.
+for path, page in pages.items():
+    relative = path.relative_to(DIST).as_posix()
+    if "data-site-base" not in page.html:
+        continue
+    language = "zh" if relative.startswith(("zh/", "docs/zh/")) else "en"
+    if relative.startswith("docs/"):
+        suffix = relative.split("/", 2)[-1] if relative != "docs/index.html" else "index.html"
+        suffix = "" if suffix == "index.html" else suffix
+        localized = {lang: BASE + f"docs/{lang}/" + suffix for lang in ("en", "zh")}
+        default = BASE + "docs/" if not suffix else localized["en"]
+    else:
+        localized = {"en": BASE, "zh": BASE + "zh/"}
+        default = BASE
+    expected_alternates = {"en": ORIGIN + localized["en"], "zh-CN": ORIGIN + localized["zh"], "x-default": ORIGIN + default}
+    if page.html.get("lang") != ("zh-CN" if language == "zh" else "en") or page.html["data-site-base"] != BASE:
+        errors.append(f"{relative}: wrong static language or base path")
+    if page.canonical != ORIGIN + localized[language] or page.alternates != expected_alternates:
+        errors.append(f"{relative}: incorrect canonical or language alternates")
+    expected_entry = {"index.html": "home", "docs/index.html": "docs"}.get(relative)
+    if page.html.get("data-language-entry") != expected_entry:
+        errors.append(f"{relative}: only neutral entries may auto-select a language")
+    if not any(ref.startswith(BASE + "assets/language.js?") for ref in page.refs):
+        errors.append(f"{relative}: missing language preference script")
+for relative, english_text in (("index.html", "Different rhythms."), ("docs/index.html", "A2RT documentation")):
+    if english_text not in (DIST / relative).read_text():
+        errors.append(f"{relative}: static English content missing")
+if pages[DIST / "docs/index.html"].base_url != BASE + "docs/en/":
+    errors.append("Default docs entry must resolve relative resources against English docs")
 
 credential = re.compile(r"(?:sk-[A-Za-z0-9_-]{16,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)")
 for path in DIST.rglob("*"):

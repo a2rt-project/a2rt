@@ -15,7 +15,7 @@
         <kbd aria-hidden="true"><span data-shortcut-modifier>⌘</span> K</kbd>
       </form>
       <a class="site-icon" href="{{ site_nav.repo }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub · a2rt-project/a2rt" title="GitHub"><img src="{{ site_nav.base }}assets/github.svg" width="20" height="20" alt=""></a>
-      <a class="site-language site-icon" href="{{ site_nav.alternate }}" lang="{{ 'en' if site_nav.other == 'en' else 'zh-CN' }}" hreflang="{{ site_nav.other }}" aria-label="{{ site_nav.language_label }}" title="{{ site_nav.language_label }}">{{ 'EN' if site_nav.other == 'en' else '中' }}</a>
+      <a class="site-language site-icon" href="{{ site_nav.alternate }}" data-site-language="{{ site_nav.other }}" lang="{{ 'en' if site_nav.other == 'en' else 'zh-CN' }}" hreflang="{{ site_nav.other }}" aria-label="{{ site_nav.language_label }}" title="{{ site_nav.language_label }}">{{ 'EN' if site_nav.other == 'en' else '中' }}</a>
       <button class="site-menu site-icon" type="button" aria-label="{{ site_nav.menu }}" aria-controls="site-navigation" aria-expanded="false" data-site-menu><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 14h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
     </div>
   </div>
