@@ -130,18 +130,19 @@ def main():
             asset_hash.update(asset.relative_to(ROOT / "site/assets").as_posix().encode())
             asset_hash.update(asset.read_bytes())
     jinja.globals["asset_version"] = asset_hash.hexdigest()[:12]
-    for lang, t in content.items():
-        home = cfg["base_path"] + ("en/" if lang == "en" else "")
+    for lang, destination, language_entry in (("en", "index.html", True), ("en", "en/index.html", False), ("zh", "zh/index.html", False)):
+        t = content[lang]
+        home = cfg["base_path"] + f"{lang}/"
         client = {"groups": t["groups"], "examples": examples, **{key: t[key] for key in ("copy", "copied", "copy_failed", "play_motion", "pause_motion", "tracks_label", "track_label")}}
         rendered = jinja.get_template("home.html").render(
             **shell_context(cfg, lang),
             t=t, lang=lang, home=home, origin=cfg["origin"], base=cfg["base_path"],
-            canonical=cfg["origin"] + home, alternate=cfg["base_path"] + ("en/" if lang == "zh" else ""),
+            canonical=cfg["origin"] + cfg["base_path"] + ("zh/" if lang == "zh" else ""), language_entry=language_entry,
             docs=cfg["base_path"] + f"docs/{lang}/", repo=cfg["repository"], year=datetime.now(timezone.utc).year,
             initial_example=json.dumps(examples["clocks"], indent=2, ensure_ascii=False),
             client_data=json.dumps(client, ensure_ascii=False).replace("<", "\\u003c"),
         )
-        target = out / ("en/index.html" if lang == "en" else "index.html")
+        target = out / destination
         target.parent.mkdir(exist_ok=True)
         target.write_text(rendered)
     (out / "404.html").write_text(jinja.get_template("404.html").render(base=cfg["base_path"]))
@@ -156,7 +157,12 @@ def main():
     for lang in ("zh", "en"):
         run(sys.executable, "-m", "sphinx", "-W", "--keep-going", "-b", "html", "-c", str(ROOT / "docs"),
             str(source / lang), str(out / "docs" / lang), env=dict(env, DOCS_LANGUAGE=lang))
-    (out / "docs/index.html").write_text(jinja.get_template("docs-index.html").render(base=cfg["base_path"]))
+    # Serve the complete English docs homepage at the neutral entry, even without JS.
+    # Its relative assets/navigation resolve against the existing English docs directory.
+    docs_entry = (out / "docs/en/index.html").read_text()
+    docs_entry = docs_entry.replace('<html ', '<html data-language-entry="docs" ', 1)
+    docs_entry = docs_entry.replace('<head>', f'<head>\n  <base href="{html.escape(cfg["base_path"], quote=True)}docs/en/">', 1)
+    (out / "docs/index.html").write_text(docs_entry)
     # Index only the built docs, not the landing page or deployment secrets.
     run(sys.executable, "scripts/build_index.py", "--html-dir", str(out / "docs"), "--output-dir", str(ROOT / "build/ai/index"))
     asset_dir = ROOT / "worker/assets/index"
@@ -171,7 +177,8 @@ def main():
     # Publish the exact same documentation index with Pages for inspection.
     shutil.copytree(ROOT / "build/ai/index", out / "docs/ai-index", dirs_exist_ok=True)
     urls = [cfg["origin"] + cfg["base_path"] + str(path.relative_to(out)).replace("index.html", "")
-            for path in out.rglob("*.html") if path.name not in ("404.html", "search.html", "genindex.html")]
+            for path in out.rglob("*.html") if path.name not in ("404.html", "search.html", "genindex.html")
+            and path.relative_to(out).as_posix() not in ("en/index.html", "docs/index.html")]
     (out / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{url}</loc></url>" for url in sorted(urls)) + "</urlset>\n")
     (out / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {cfg['origin']}{cfg['base_path']}sitemap.xml\n")
     print(f"Built website + bilingual docs in {out}; Worker index in {asset_dir}")

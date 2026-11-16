@@ -24,7 +24,7 @@ _LANGUAGE_ALIASES = {
     "en": "en",
     "en-US": "en",
 }
-language = _LANGUAGE_ALIASES.get(os.environ.get("DOCS_LANGUAGE", "zh_CN"), "zh_CN")
+language = _LANGUAGE_ALIASES.get(os.environ.get("DOCS_LANGUAGE", "en"), "en")
 _LANGUAGE_CODE = "en" if language.startswith("en") else "zh"
 _LANGUAGE_LABELS = {
     "zh": {"label": "中文", "html_lang": "zh-CN", "sphinx_language": "zh_CN"},
@@ -143,7 +143,7 @@ for _asset_root in (_THEME_DIR / "psdocs/static", Path(__file__).parent / "stati
 html_context = {
     "asset_version": _ASSET_HASH.hexdigest()[:16],
     "a2rt_base": _CONFIG["base_path"],
-    "a2rt_home": _CONFIG["base_path"] + ("en/" if _LANGUAGE_CODE == "en" else ""),
+    "a2rt_home": _CONFIG["base_path"] + _LANGUAGE_CODE + "/",
     "a2rt_ai_endpoint": _CONFIG["ai_endpoint"],
     "a2rt_turnstile_site_key": _CONFIG["turnstile_site_key"],
     "breadcrumb_sections": _BREADCRUMB_SECTIONS[_LANGUAGE_CODE],

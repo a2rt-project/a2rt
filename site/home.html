@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ 'zh-CN' if lang == 'zh' else 'en' }}">
+<html lang="{{ 'zh-CN' if lang == 'zh' else 'en' }}" data-site-base="{{ base }}"{% if language_entry %} data-language-entry="home"{% endif %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,9 +12,7 @@
   <meta property="og:description" content="{{ t.description }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ canonical }}">
-  <link rel="canonical" href="{{ canonical }}">
-  <link rel="alternate" hreflang="zh-CN" href="{{ origin }}{{ base }}">
-  <link rel="alternate" hreflang="en" href="{{ origin }}{{ base }}en/">
+  {% include "partials/language-meta.html" %}
   <link rel="icon" type="image/svg+xml" href="{{ base }}assets/favicon.svg?v={{ asset_version }}">
   <link rel="stylesheet" href="{{ base }}assets/site.css?v={{ asset_version }}">
   <link rel="stylesheet" href="{{ base }}assets/rhythm.css?v={{ asset_version }}">

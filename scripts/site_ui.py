@@ -70,9 +70,17 @@ _SEARCH_EXAMPLES = {
 
 def shell_context(config, language, page=None):
     base = config["base_path"]
-    home = base + ("en/" if language == "en" else "")
+    # Explicit language URLs stay stable even when browser preferences differ.
+    home = base + f"{language}/"
     docs = base + f"docs/{language}/"
     other = "en" if language == "zh" else "zh"
+    if page is None:
+        localized = {"en": base, "zh": base + "zh/"}
+        default = base
+    else:
+        suffix = "" if page == "index" else page + ".html"
+        localized = {code: base + f"docs/{code}/" + suffix for code in ("en", "zh")}
+        default = base + "docs/" if page == "index" else localized["en"]
     enabled = bool(config["ai_endpoint"] and config["turnstile_site_key"])
     ui = deepcopy(_UI_TEXT[language])
     examples = _SEARCH_EXAMPLES[language]
@@ -88,9 +96,12 @@ def shell_context(config, language, page=None):
             "architecture": "架构" if language == "zh" else "Architecture",
             "label": "网站导航" if language == "zh" else "Main navigation",
             "menu": "展开导航" if language == "zh" else "Toggle navigation",
-            "alternate": base + f"docs/{other}/{page}.html" if page is not None else base + ("en/" if other == "en" else ""),
+            "alternate": localized[other] if page is not None else base + f"{other}/",
             "other": other, "language_label": "English" if other == "en" else "切换为中文",
         },
+        "site_seo": {"canonical": config["origin"] + localized[language],
+                     "en": config["origin"] + localized["en"], "zh": config["origin"] + localized["zh"],
+                     "default": config["origin"] + default},
         "search_action": docs + "search.html", "ps_ui": ui,
         "ps_current_language": {"code": language, "html_lang": "zh-CN" if language == "zh" else "en"},
         "ps_search_examples": examples, "a2rt_ai_enabled": enabled,

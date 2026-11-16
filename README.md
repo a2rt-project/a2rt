@@ -21,6 +21,12 @@ python -m http.server 4173 --bind 127.0.0.1 --directory dist
 
 打开 `http://127.0.0.1:4173/`。`--preview` 使用当前双语索引进行本地全文搜索，不连接生产 AI Worker。正式构建使用 `python scripts/build.py`，AI 入口读取公开站点配置。密钥只保存在 Worker Secrets。
 
+## 语言入口与搜索引擎
+
+`/` 输出完整英文首页，`/docs/` 输出完整英文文档首页。两处默认入口在浏览器中优先读取手动语言选择，否则按浏览器首选语言识别：`zh` 及其变体进入中文，其他语言使用英文。没有 JavaScript 时保留英文内容和可访问链接。
+
+`/en/`、`/zh/` 与 `/docs/en/`、`/docs/zh/` 固定语言，不自动重定向。导航切换将选择保存在 `localStorage` 的 `a2rt.language`；存储不可用时链接仍可切换语言。英文首页 canonical 指向 `/`，中文首页指向 `/zh/`，文档逐页提供 canonical、双向 hreflang 和 x-default。sitemap 只列出对应的规范地址。
+
 ## 内容与来源
 
 ```text
