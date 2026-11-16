@@ -26,6 +26,10 @@ class Page(HTMLParser):
             self.ids.add(attrs["id"])
         if tag in ("a", "link") and attrs.get("href"):
             self.refs.append(attrs["href"])
+        if tag == "form" and attrs.get("action"):
+            self.refs.append(attrs["action"])
+        if tag == "source" and attrs.get("srcset"):
+            self.refs.extend(item.strip().split()[0] for item in attrs["srcset"].split(","))
         if tag in ("script", "img", "source") and attrs.get("src"):
             self.refs.append(attrs["src"])
 

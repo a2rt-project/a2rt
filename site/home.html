@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ t.title }}</title>
   <meta name="description" content="{{ t.description }}">
+  <meta name="a2rt-ai-endpoint" content="{{ a2rt_ai_endpoint }}">
+  <meta name="a2rt-turnstile-site-key" content="{{ a2rt_turnstile_site_key }}">
   <meta name="theme-color" content="#f8fafd">
   <meta property="og:title" content="{{ t.title }}">
   <meta property="og:description" content="{{ t.description }}">
@@ -15,20 +17,17 @@
   <link rel="alternate" hreflang="en" href="{{ origin }}{{ base }}en/">
   <link rel="icon" type="image/svg+xml" href="{{ base }}assets/favicon.svg?v={{ asset_version }}">
   <link rel="stylesheet" href="{{ base }}assets/site.css?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ base }}assets/rhythm.css?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ base }}assets/shell.css?v={{ asset_version }}">
+  <link rel="stylesheet" href="{{ base }}assets/search.css?v={{ asset_version }}">
+  <script src="{{ base }}assets/shell.js?v={{ asset_version }}" defer></script>
+  <script src="{{ base }}assets/search.js?v={{ asset_version }}" defer></script>
   <script src="{{ base }}assets/site.js?v={{ asset_version }}" defer></script>
 </head>
 <body data-language="{{ lang }}">
   <a class="skip-link" href="#main">{{ t.skip }}</a>
-  <header class="header">
-    <a class="wordmark" href="{{ home }}" aria-label="A2RT {{ t.home }}"><img src="{{ base }}assets/logo-symbol.svg?v={{ asset_version }}" width="34" height="34" alt="" aria-hidden="true"><span>A2RT</span></a>
-    <button class="menu-toggle" aria-label="{{ t.menu }}" aria-controls="navigation" aria-expanded="false"><span></span><span></span></button>
-    <nav id="navigation" aria-label="{{ t.navigation }}">
-      <a href="#protocol">{{ t.nav_protocol }}</a><a href="#architecture">{{ t.nav_architecture }}</a><a href="{{ docs }}">Docs <span class="nav-arrow">↗</span></a>
-      <span class="nav-divider"></span>
-      <a class="language" href="{{ alternate }}" lang="{{ 'en' if lang == 'zh' else 'zh-CN' }}">{{ 'EN' if lang == 'zh' else '中文' }}</a>
-      <a class="github-link" href="{{ repo }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub · a2rt-project/a2rt"><img class="github-icon" src="{{ base }}assets/github.svg?v={{ asset_version }}" width="17" height="17" alt="" aria-hidden="true">GitHub <span aria-hidden="true">↗</span></a>
-    </nav>
-  </header>
+  {% include "partials/site-header.html" %}
+  {% include "partials/search.html" %}
   <main id="main">
     <section class="hero wrap" aria-labelledby="hero-title">
       <div class="hero-copy">
@@ -39,42 +38,45 @@
         <div class="hero-actions"><a class="button primary" href="{{ docs }}quickstart.html">{{ t.start }} <span aria-hidden="true">→</span></a><a class="text-link" href="#playground">{{ t.explore }} <span aria-hidden="true">↘</span></a></div>
         <div class="hero-note"><span class="tiny-mark">⌁</span> {{ t.hero_note }}</div>
       </div>
-      <div class="signal-console architecture-console" id="playground" aria-label="{{ t.console_label }}">
-        <div class="console-top"><div><span class="status-dot"></span><span>A2RT / CLOCK → GROUP → TRACK</span></div><span class="console-badge">{{ t.illustration }}</span></div>
-        <div class="root-clock"><span class="clock-symbol" aria-hidden="true">◎</span><div><strong>root <span>1,000 Hz</span></strong><small>{{ t.root_capacity }}</small></div><span class="root-label">SHARED<br>TIME + CAPACITY</span></div>
-        <div class="group-tabs" role="tablist" aria-label="{{ t.select_group }}">{% for group in t.groups %}<button role="tab" id="group-tab-{{ loop.index0 }}" aria-controls="group-panel" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ '0' if loop.first else '-1' }}" data-group="{{ loop.index0 }}">{{ group.id }}</button>{% endfor %}</div>
-        {% set group = t.groups[0] %}
-        <div class="group-panel" id="group-panel" role="tabpanel" aria-labelledby="group-tab-0" tabindex="0">
-          <div class="group-heading"><code data-group-clock>{{ group.clock }}</code><span data-group-period>{{ group.period }} root ticks / window</span></div>
-          <div class="group-window-label">{{ t.window_label }}</div>
-          <div class="window-labels"><span>TRACK / ROLE / DIRECTION</span><div data-window-labels>{% for n in range(4) %}<span>{{ n * group.period }}–{{ (n + 1) * group.period }}</span>{% endfor %}</div></div>
-          <div class="group-tracks" data-group-tracks>{% for track in group.tracks %}<div class="window-track"><div><strong>{{ track.id }}</strong><small>{{ track.role }} · {{ track.direction }}</small></div><div class="window-cells">{% for n in range(4) %}<span class="window-cell">{{ track.format }}</span>{% endfor %}</div></div>{% endfor %}</div>
-          <div class="group-rule"><span aria-hidden="true">↳</span> {{ t.one_frame }}</div>
-          <div class="group-limits"><div><small>{{ t.group_budget }}</small><strong><span data-group-units>{{ group.units }}</span> <em>{{ t.unit_label }}</em></strong></div><div><small>{{ t.queue_label }}</small><strong><span data-group-queue>{{ group.queue }}</span> <em>{{ t.frame_label }}</em></strong></div></div>
+      <figure class="rhythm" id="playground" aria-labelledby="rhythm-title" data-motion="paused">
+        <div class="rhythm-heading"><div><span class="rhythm-label">{{ t.illustration }}</span><h2 id="rhythm-title">{{ t.rhythm_title }}</h2></div><button class="motion-toggle" type="button" data-motion-toggle aria-label="{{ t.play_motion }}" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path class="motion-pause" d="M5 3v10M11 3v10" stroke="currentColor" stroke-width="2"/><path class="motion-play" d="m5 3 8 5-8 5Z" fill="currentColor"/></svg><span data-motion-label>{{ t.play_motion }}</span></button></div>
+        <div class="rhythm-root"><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M16 8v8l5 3M16 2v3M16 27v3M2 16h3M27 16h3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><div><strong>root <span>1,000 Hz</span></strong><small>{{ t.root_capacity }}</small></div></div>
+        <div class="rhythm-scale" aria-hidden="true"><span>{{ t.window_label }}</span><div><span>0</span><span>50</span><span>100</span></div></div>
+        <div class="rhythm-lanes" role="tablist" aria-label="{{ t.select_group }}" aria-orientation="vertical">
+          {% for group in t.groups %}<button class="rhythm-lane rhythm-lane--{{ loop.index }}" role="tab" id="group-tab-{{ loop.index0 }}" aria-controls="group-panel" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ '0' if loop.first else '-1' }}" data-group="{{ loop.index0 }}">
+            <span class="rhythm-name"><strong>{{ group.id }}</strong><small>{{ group.period }} {{ t.ticks_window }}</small></span>
+            <span class="rhythm-windows" aria-hidden="true" style="--windows:{{ 100 // group.period }}">{% for n in range(100 // group.period) %}<span class="rhythm-window">{% if group.period == 100 %}<svg viewBox="0 0 300 36" preserveAspectRatio="none"><path d="M0 18h14l5-5 5 10 5-17 5 24 5-15 5 3h16l5-8 5 16 5-22 5 28 5-21 5 7h20l5-4 5 8 5-15 5 22 5-13 5 2h20l5-8 5 17 5-25 5 31 5-21 5 6h19l5-5 5 10 5-18 5 25 5-14 5 2h40" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>{% else %}<i></i>{% endif %}</span>{% endfor %}<span class="rhythm-cursor"></span></span>
+          </button>{% endfor %}
         </div>
-        <div class="track-inspector"><span class="inspector-tag" data-group-title>{{ group.id }}</span><p data-group-description>{{ group.description }}</p><a href="{{ docs }}spec/01-clock-sync-group-track-model.html">{{ t.group_details }} <span aria-hidden="true">↗</span></a></div>
-        <p class="console-caption">{{ t.console_caption }}</p>
-      </div>
+        {% set group = t.groups[0] %}
+        <div class="rhythm-detail" id="group-panel" role="tabpanel" aria-labelledby="group-tab-0" tabindex="0">
+          <div class="rhythm-detail__heading"><code data-group-clock>{{ group.clock }}</code><span data-group-track-count>{{ group.tracks|length }} {{ t.tracks_label }}</span></div>
+          <div class="rhythm-tracks" data-group-tracks>{% for track in group.tracks %}<span>{{ track.id }}</span>{% endfor %}</div>
+          <p data-group-description>{{ group.description }}</p>
+          <a href="{{ docs }}spec/01-clock-sync-group-track-model.html">{{ t.group_details }} <span aria-hidden="true">↗</span></a>
+        </div>
+        <figcaption>{{ t.motion_caption }}</figcaption>
+      </figure>
     </section>
     <div class="protocol-strip"><div class="wrap"><span><i></i> A2RT / DRAFT</span><span>{{ t.strip_one }}</span><span>{{ t.strip_two }}</span><span>{{ t.strip_three }}</span></div></div>
 
     <section class="principles wrap section" id="protocol" aria-labelledby="protocol-title">
-      <div class="section-heading"><p class="eyebrow"><span>01 /</span> THE PROTOCOL</p><h2 id="protocol-title">{{ t.protocol_title }}</h2><p>{{ t.protocol_intro }}</p></div>
+      <div class="section-heading"><p class="eyebrow">THE PROTOCOL</p><h2 id="protocol-title">{{ t.protocol_title }}</h2><p>{{ t.protocol_intro }}</p></div>
       <div class="principle-grid">
-        {% for item in t.principles %}<article class="principle"><span class="principle-number">0{{ loop.index }}</span><div class="mini-diagram diagram-{{ loop.index }}" aria-hidden="true">{% if loop.index == 1 %}<i></i><i></i><i></i><i></i>{% elif loop.index == 2 %}<span>clock</span><b>→</b><span>group</span>{% else %}<span>Core</span><b>+</b><span>Profile</span>{% endif %}</div><h3>{{ item.title }}</h3><p>{{ item.body }}</p></article>{% endfor %}
+        {% for item in t.principles %}<article class="principle"><div class="mini-diagram diagram-{{ loop.index }}" aria-hidden="true">{% if loop.index == 1 %}<i></i><i></i><i></i><i></i>{% elif loop.index == 2 %}<span>clock</span><b>→</b><span>group</span>{% else %}<span>Core</span><b>+</b><span>Profile</span>{% endif %}</div><h3>{{ item.title }}</h3><p>{{ item.body }}</p></article>{% endfor %}
       </div>
     </section>
 
     <section class="architecture-section section" id="architecture" aria-labelledby="architecture-title"><div class="wrap architecture-grid">
-      <div class="section-heading"><p class="eyebrow"><span>02 /</span> BUILT TO CONNECT</p><h2 id="architecture-title">{{ t.architecture_title }}</h2><p>{{ t.architecture_intro }}</p><a class="text-link" href="{{ docs }}spec/03-core-profile-responsibilities.html">{{ t.architecture_link }} <span aria-hidden="true">↗</span></a><div class="architecture-note"><span>↳</span>{{ t.architecture_note }}</div></div>
-      <div class="layer-stack">{% for item in t.layers %}<details class="layer" {% if loop.first %}open{% endif %}><summary><span class="layer-index">0{{ loop.index }}</span><span><b>{{ item.name }}</b><small>{{ item.subtitle }}</small></span><span class="layer-expand">+</span></summary><div class="layer-content"><p>{{ item.body }}</p><div class="layer-tags">{% for tag in item.tags %}<code>{{ tag }}</code>{% endfor %}</div></div></details>{% endfor %}</div>
+      <div class="section-heading"><p class="eyebrow">BUILT TO CONNECT</p><h2 id="architecture-title">{{ t.architecture_title }}</h2><p>{{ t.architecture_intro }}</p><a class="text-link" href="{{ docs }}spec/03-core-profile-responsibilities.html">{{ t.architecture_link }} <span aria-hidden="true">↗</span></a><div class="architecture-note"><span>↳</span>{{ t.architecture_note }}</div></div>
+      <div class="layer-stack">{% for item in t.layers %}<details class="layer" {% if loop.first %}open{% endif %}><summary><span><b>{{ item.name }}</b><small>{{ item.subtitle }}</small></span><span class="layer-expand">+</span></summary><div class="layer-content"><p>{{ item.body }}</p><div class="layer-tags">{% for tag in item.tags %}<code>{{ tag }}</code>{% endfor %}</div></div></details>{% endfor %}</div>
     </div></section>
 
-    <section class="example-section section wrap" id="examples" aria-labelledby="example-title"><div class="section-heading"><p class="eyebrow"><span>03 /</span> EXPLORE THE CONFIGURATION</p><h2 id="example-title">{{ t.example_title }}</h2><p>{{ t.example_intro }}</p></div>
-      <div class="example-grid"><div class="code-window"><div class="code-toolbar"><div class="code-tabs" role="tablist" aria-label="{{ t.example_tabs }}">{% for name in ['clocks','group','track'] %}<button role="tab" id="tab-{{ name }}" aria-controls="code-panel" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ '0' if loop.first else '-1' }}" data-example="{{ name }}">{{ name }}<span>.json</span></button>{% endfor %}</div><button class="copy-button" data-copy aria-label="{{ t["copy"] }}">{{ t["copy"] }}</button></div><pre id="code-panel" role="tabpanel" aria-labelledby="tab-clocks" tabindex="0"><code data-code>{{ initial_example }}</code></pre><div class="code-footer"><span><i class="status-dot"></i>{{ t.fixture }}</span><a href="{{ base }}assets/architecture-example.json?v={{ asset_version }}" download>{{ t.download }} ↓</a></div></div><div class="example-notes"><p class="example-kicker">{{ t.example_kicker }}</p>{% for item in t.example_notes %}<div><span>0{{ loop.index }}</span><h3>{{ item.title }}</h3><p>{{ item.body }}</p></div>{% endfor %}<a href="{{ docs }}examples.html" class="text-link">{{ t.all_examples }} ↗</a></div></div>
+    <section class="example-section section wrap" id="examples" aria-labelledby="example-title"><div class="section-heading"><p class="eyebrow">EXPLORE THE CONFIGURATION</p><h2 id="example-title">{{ t.example_title }}</h2><p>{{ t.example_intro }}</p></div>
+      <div class="example-grid"><div class="code-window"><div class="code-toolbar"><div class="code-tabs" role="tablist" aria-label="{{ t.example_tabs }}">{% for name in ['clocks','group','track'] %}<button role="tab" id="tab-{{ name }}" aria-controls="code-panel" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ '0' if loop.first else '-1' }}" data-example="{{ name }}">{{ name }}<span>.json</span></button>{% endfor %}</div><button class="copy-button" aria-live="polite" data-copy aria-label="{{ t["copy"] }}">{{ t["copy"] }}</button></div><pre id="code-panel" role="tabpanel" aria-labelledby="tab-clocks" tabindex="0"><code data-code>{{ initial_example }}</code></pre><div class="code-footer"><span><i class="status-dot"></i>{{ t.fixture }}</span><a href="{{ base }}assets/architecture-example.json?v={{ asset_version }}" download>{{ t.download }} ↓</a></div></div><div class="example-notes"><p class="example-kicker">{{ t.example_kicker }}</p>{% for item in t.example_notes %}<div><h3>{{ item.title }}</h3><p>{{ item.body }}</p></div>{% endfor %}<a href="{{ docs }}examples.html" class="text-link">{{ t.all_examples }} ↗</a></div></div>
     </section>
 
-    <section class="faq-section wrap section" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow"><span>04 /</span> BEFORE YOU BUILD</p><h2 id="faq-title">{{ t.faq_title }}</h2></div><div class="faq-list">{% for item in t.faq %}<details><summary>{{ item.question }}<span>+</span></summary><p>{{ item.answer }}</p></details>{% endfor %}</div></section>
+    <section class="faq-section wrap section" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">BEFORE YOU BUILD</p><h2 id="faq-title">{{ t.faq_title }}</h2></div><div class="faq-list">{% for item in t.faq %}<details><summary>{{ item.question }}<span>+</span></summary><p>{{ item.answer }}</p></details>{% endfor %}</div></section>
     <section class="closing wrap"><div class="closing-mark" aria-hidden="true">↗</div><p class="eyebrow">A PROTOCOL. MANY POSSIBILITIES.</p><h2>{{ t.closing_title }}</h2><p>{{ t.closing_body }}</p><div class="hero-actions"><a class="button primary" href="{{ docs }}">{{ t.read_docs }} →</a><a class="button secondary" href="{{ repo }}" target="_blank" rel="noopener noreferrer">{{ t.contribute }} ↗</a></div></section>
   </main>
   <footer class="footer wrap"><div><a class="wordmark" href="{{ home }}"><img src="{{ base }}assets/logo-symbol.svg?v={{ asset_version }}" width="34" height="34" alt="" aria-hidden="true"><span>A2RT</span></a><p>Agent-to-Real-Time Protocol</p></div><nav aria-label="{{ t.footer_navigation }}"><a href="{{ docs }}">Documentation</a><a href="{{ docs }}spec/01-clock-sync-group-track-model.html">{{ t.footer_reference }}</a><a href="{{ repo }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav><span class="footer-status"><span class="status-dot"></span>{{ t.release }}</span><div class="footer-bottom"><span>© {{ year }} A2RT Project</span><span>{{ t.footer_note }}</span><a href="#main">{{ t.back_top }} ↑</a></div></footer>

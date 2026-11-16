@@ -14,6 +14,8 @@ import sys
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
+from site_ui import shell_context
+
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -66,6 +68,8 @@ def prepare_docs(cfg):
     profile.write_text(body)
     for page in source.rglob("*.md"):
         body = re.sub(r"\[([^\]]+)\]\((/[^)]+)\)", lambda m: '<a href="' + html.escape(m[2], quote=True) + '">' + html.escape(m[1]) + '</a>', page.read_text())
+        body = re.sub(r'<img src="[^"]*/assets/clock-groups.svg"([^>]*)>',
+                      lambda match: f'<picture><source media="(max-width: 600px)" srcset="{cfg["base_path"]}assets/clock-groups-mobile.svg"><img src="{cfg["base_path"]}assets/clock-groups.svg" width="840" height="430"{match[1]}></picture>', body)
         page.write_text(body)
     return source
 
@@ -109,8 +113,9 @@ def main():
     jinja.globals["asset_version"] = asset_hash.hexdigest()[:12]
     for lang, t in content.items():
         home = cfg["base_path"] + ("en/" if lang == "en" else "")
-        client = {"groups": t["groups"], "examples": examples, **{key: t[key] for key in ("copy", "copied", "copy_failed")}}
+        client = {"groups": t["groups"], "examples": examples, **{key: t[key] for key in ("copy", "copied", "copy_failed", "play_motion", "pause_motion", "tracks_label", "track_label")}}
         rendered = jinja.get_template("home.html").render(
+            **shell_context(cfg, lang),
             t=t, lang=lang, home=home, origin=cfg["origin"], base=cfg["base_path"],
             canonical=cfg["origin"] + home, alternate=cfg["base_path"] + ("en/" if lang == "zh" else ""),
             docs=cfg["base_path"] + f"docs/{lang}/", repo=cfg["repository"], year=datetime.now(timezone.utc).year,
