@@ -53,6 +53,6 @@ There is no real model connection, microphone capture, business database, or pro
 ```{toctree}
 :maxdepth: 1
 
-interaction
-binary-binding
+Interaction & delivery <interaction>
+Binary audio <binary-binding>
 ```

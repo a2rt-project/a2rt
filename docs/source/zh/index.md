@@ -34,8 +34,8 @@ A2RT 是面向智能体与环境的实时业务信息交互协议，提供可配
 :maxdepth: 1
 :hidden:
 
-overview
-quickstart
+协议概览 <overview>
+接入指南 <quickstart>
 ```
 
 ```{toctree}
@@ -43,10 +43,10 @@ quickstart
 :maxdepth: 1
 :hidden:
 
-spec/01-clock-sync-group-track-model
-spec/02-media-types-and-negotiation
-spec/03-core-profile-responsibilities
-spec/04-system-track-and-lifecycle
+时钟、同步组与轨道 <spec/01-clock-sync-group-track-model>
+媒体与格式协商 <spec/02-media-types-and-negotiation>
+Core 与 Profile <spec/03-core-profile-responsibilities>
+系统与生命周期 <spec/04-system-track-and-lifecycle>
 ```
 
 ```{toctree}
@@ -54,8 +54,8 @@ spec/04-system-track-and-lifecycle
 :maxdepth: 1
 :hidden:
 
-profiles/canvas
-profiles/canvas-realtime/index
+Canvas 接入 <profiles/canvas>
+Canvas Realtime <profiles/canvas-realtime/index>
 ```
 
 ```{toctree}
@@ -63,7 +63,7 @@ profiles/canvas-realtime/index
 :maxdepth: 1
 :hidden:
 
-examples
-glossary
-changelog
+配置示例 <examples>
+术语表 <glossary>
+实现状态 <changelog>
 ```
