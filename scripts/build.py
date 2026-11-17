@@ -76,7 +76,7 @@ def prepare_docs(cfg):
         if original == "README.md":
             body = re.sub(r"^# .*", "# 协议概览", body, count=1)
         if original == "profiles/canvas-realtime/README.md":
-            body += "\n```{toctree}\n:maxdepth: 1\n\ninteraction\nbinary-binding\n```\n"
+            body += "\n```{toctree}\n:maxdepth: 1\n\n交互与交付 <interaction>\n二进制音频 <binary-binding>\n```\n"
         # CommonMark needs separation after punctuation-ending emphasis before
         # adjacent CJK prose. Adapt rendering without modifying the source copy.
         body = re.sub(r"([）”])\*\*(?=[\u4e00-\u9fff])", r"\1** ", body)

@@ -2,7 +2,7 @@
   'use strict';
   const toggle = document.querySelector('[data-site-menu]');
   const navigation = document.getElementById('site-navigation');
-  const breakpoint = matchMedia('(max-width: 700px)');
+  const breakpoint = matchMedia('(max-width: 767px)');
   function closeMenu(restoreFocus = false) {
     navigation.classList.remove('is-open');
     toggle.setAttribute('aria-expanded', 'false');

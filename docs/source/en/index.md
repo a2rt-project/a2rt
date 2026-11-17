@@ -34,28 +34,28 @@ Sharing a clock does not create a shared waiting barrier. Each receiver applies 
 :maxdepth: 1
 :hidden:
 
-overview
-quickstart
+Overview <overview>
+Integration guide <quickstart>
 ```
 
 ```{toctree}
-:caption: Core architecture guide
+:caption: Core architecture
 :maxdepth: 1
 :hidden:
 
-spec/01-clock-sync-group-track-model
-spec/02-media-types-and-negotiation
-spec/03-core-profile-responsibilities
-spec/04-system-track-and-lifecycle
+Clocks, groups & tracks <spec/01-clock-sync-group-track-model>
+Media & negotiation <spec/02-media-types-and-negotiation>
+Core & Profile <spec/03-core-profile-responsibilities>
+System & lifecycle <spec/04-system-track-and-lifecycle>
 ```
 
 ```{toctree}
-:caption: Application Profile
+:caption: Profiles
 :maxdepth: 1
 :hidden:
 
-profiles/canvas
-profiles/canvas-realtime/index
+Canvas integration <profiles/canvas>
+Canvas Realtime <profiles/canvas-realtime/index>
 ```
 
 ```{toctree}
@@ -63,7 +63,7 @@ profiles/canvas-realtime/index
 :maxdepth: 1
 :hidden:
 
-examples
-glossary
-changelog
+Configuration examples <examples>
+Glossary <glossary>
+Implementation status <changelog>
 ```
